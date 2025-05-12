@@ -1,0 +1,10 @@
+{
+  "cslediagnostic.display.name": "Chinese Expression Diagnostic",
+  "cslediagnostic.checkGlyph.desc": "Check for simplified characters in Traditional Chinese text",
+  "cslediagnostic.convertGlyph.desc": "Enable conversion to Traditional Chinese characters",
+  "cslediagnostic.excludeMethods.desc": "Method names to exclude from checking",
+  "cslediagnostic.simplified": "Simplified",
+  "cslediagnostic.traditional.tw": "Traditional(TW)",
+  "cslediagnostic.traditional.hk": "Traditional(HK)",
+  "cslediagnostic.traditional": "Traditional"
+}

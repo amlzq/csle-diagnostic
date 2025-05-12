@@ -1,0 +1,104 @@
+{
+  "name": "amlzq.csle-diagnostic",
+  "displayName": "%cslediagnostic.display.name%",
+  "description": "Diagnostic whether the string literal expression contains Chinese characters, and can quickly fix them between simplified or traditional glyphs.",
+  "version": "0.0.1",
+  "publisher": "Zeaon",
+  "engines": {
+    "vscode": "^1.75.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "onLanguage:dart",
+    "onLanguage:javascript",
+    "onLanguage:typescript",
+    "onLanguage:php",
+    "onLanguage:python"
+  ],
+  "main": "./out/extension.js",
+  "l10n": "./l10n",
+  "contributes": {
+    "configuration": {
+      "type": "object",
+      "title": "%cslediagnostic.display.name%",
+      "properties": {
+        "cslediagnostic.checkGlyph": {
+          "type": "string",
+          "default": "%cslediagnostic.simplified%",
+          "enum": [
+            "%cslediagnostic.simplified%",
+            "%cslediagnostic.traditional.tw%",
+            "%cslediagnostic.traditional.hk%"
+          ],
+          "enumDescriptions": [
+            "Check for Simplified Chinese",
+            "Check for Traditional(TW) Chinese",
+            "Check for Traditional(HK) Chinese"
+          ],
+          "description": "%cslediagnostic.checkGlyph.desc%"
+        },
+        "cslediagnostic.convertGlyph": {
+          "type": "string",
+          "default": "%cslediagnostic.traditional.tw%",
+          "enum": [
+            "%cslediagnostic.simplified%",
+            "%cslediagnostic.traditional.tw%",
+            "%cslediagnostic.traditional.hk%"
+          ],
+          "enumDescriptions": [
+            "Check for Simplified Chinese",
+            "Check for Traditional(TW) Chinese",
+            "Check for Traditional(HK) Chinese"
+          ],
+          "description": "%cslediagnostic.convertGlyph.desc%"
+        },
+        "cslediagnostic.excludeMethods": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": [],
+          "description": "%cslediagnostic.excludeMethods.desc%"
+        }
+      }
+    },
+    "languages": [
+      {
+        "id": "dart",
+        "extensions": [
+          ".dart"
+        ],
+        "aliases": [
+          "Dart",
+          "dart"
+        ]
+      }
+    ]
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "pretest": "npm run compile && npm run lint",
+    "lint": "eslint src",
+    "test": "vscode-test"
+  },
+  "devDependencies": {
+    "@types/mocha": "^10.0.10",
+    "@types/node": "20.x",
+    "@types/vscode": "^1.99.0",
+    "@typescript-eslint/eslint-plugin": "^8.31.1",
+    "@typescript-eslint/parser": "^8.31.1",
+    "@vscode/test-cli": "^0.0.10",
+    "@vscode/test-electron": "^2.5.2",
+    "eslint": "^9.25.1",
+    "typescript": "^5.8.3"
+  },
+  "dependencies": {
+    "@types/opencc-js": "^1.0.3",
+    "opencc-js": "^1.0.5",
+    "vscode-nls": "^5.2.0"
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "cslediagnostic.display.name": "中文表达式诊断",
+  "cslediagnostic.checkGlyph.desc": "检查字形",
+  "cslediagnostic.convertGlyph.desc": "转换字形（不能与 检查字形 相同）",
+  "cslediagnostic.excludeMethods.desc": "排除检查的函数名或方法链（如 print, logger.debug 等）",
+  "cslediagnostic.simplified": "简体中文",
+  "cslediagnostic.traditional.tw": "台湾正体",
+  "cslediagnostic.traditional.hk": "香港繁体",
+  "cslediagnostic.traditional": "繁体中文"
+}
