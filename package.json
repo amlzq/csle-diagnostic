@@ -1,9 +1,14 @@
 {
-  "name": "amlzq.csle-diagnostic",
+  "name": "csle-diagnostic",
   "displayName": "%cslediagnostic.display.name%",
-  "description": "Diagnostic whether the string literal expression contains Chinese characters, and can quickly fix them between simplified or traditional glyphs.",
+  "description": "Diagnose whether the string literal expression contains Chinese characters, and can quickly fix them between simplified or traditional glyphs.",
   "version": "0.0.1",
-  "publisher": "Zeaon",
+  "icon": "icon.png",
+  "publisher": "amlzq",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/amlzq/csle-diagnostic"
+  },
   "engines": {
     "vscode": "^1.75.0"
   },
@@ -88,7 +93,7 @@
   "devDependencies": {
     "@types/mocha": "^10.0.10",
     "@types/node": "20.x",
-    "@types/vscode": "^1.99.0",
+    "@types/vscode": "^1.75.0",
     "@typescript-eslint/eslint-plugin": "^8.31.1",
     "@typescript-eslint/parser": "^8.31.1",
     "@vscode/test-cli": "^0.0.10",

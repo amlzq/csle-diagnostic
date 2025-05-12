@@ -17,4 +17,4 @@ If you want more supported languages, new an issue.
 
 ### Installation
 
-[Chinese Expression Diagnostic]()
+[Chinese Expression Diagnostic](https://marketplace.visualstudio.com/items?itemName=amlzq.csle-diagnostic)
