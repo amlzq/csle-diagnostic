@@ -4,7 +4,11 @@
   "cslediagnostic.convertGlyph.desc": "轉換字形（不能與 檢查字形 相同）",
   "cslediagnostic.excludeMethods.desc": "排除檢查的函數名稱或方法鏈（如 print，logger.debug 等）",
   "cslediagnostic.simplified": "簡體中文",
+  "cslediagnostic.simplified.desc": "檢查簡體中文",
   "cslediagnostic.traditional.tw": "台灣正體",
+  "cslediagnostic.traditional.tw.desc": "檢查正體中文（台灣）",
   "cslediagnostic.traditional.hk": "香港繁體",
-  "cslediagnostic.traditional": "繁體中文"
+  "cslediagnostic.traditional.hk.desc": "檢查繁體中文（香港）",
+  "cslediagnostic.traditional": "繁體中文",
+  "cslediagnostic.traditional.desc": "檢查繁體中文"
 }

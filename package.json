@@ -35,12 +35,14 @@
           "enum": [
             "%cslediagnostic.simplified%",
             "%cslediagnostic.traditional.tw%",
-            "%cslediagnostic.traditional.hk%"
+            "%cslediagnostic.traditional.hk%",
+            "%cslediagnostic.traditional%"
           ],
           "enumDescriptions": [
-            "Check for Simplified Chinese",
-            "Check for Traditional(TW) Chinese",
-            "Check for Traditional(HK) Chinese"
+            "%cslediagnostic.simplified.desc%",
+            "%cslediagnostic.traditional.tw.desc%",
+            "%cslediagnostic.traditional.hk.desc%",
+            "%cslediagnostic.traditional.desc%"
           ],
           "description": "%cslediagnostic.checkGlyph.desc%"
         },
@@ -50,12 +52,14 @@
           "enum": [
             "%cslediagnostic.simplified%",
             "%cslediagnostic.traditional.tw%",
-            "%cslediagnostic.traditional.hk%"
+            "%cslediagnostic.traditional.hk%",
+            "%cslediagnostic.traditional%"
           ],
           "enumDescriptions": [
-            "Check for Simplified Chinese",
-            "Check for Traditional(TW) Chinese",
-            "Check for Traditional(HK) Chinese"
+            "%cslediagnostic.simplified.desc%",
+            "%cslediagnostic.traditional.tw.desc%",
+            "%cslediagnostic.traditional.hk.desc%",
+            "%cslediagnostic.traditional.desc%"
           ],
           "description": "%cslediagnostic.convertGlyph.desc%"
         },
@@ -78,6 +82,46 @@
         "aliases": [
           "Dart",
           "dart"
+        ]
+      },
+      {
+        "id": "javascript",
+        "extensions": [
+          ".js"
+        ],
+        "aliases": [
+          "JavaScript",
+          "javascript"
+        ]
+      },
+      {
+        "id": "typescript",
+        "extensions": [
+          ".ts"
+        ],
+        "aliases": [
+          "TypeScript",
+          "typescript"
+        ]
+      },
+      {
+        "id": "php",
+        "extensions": [
+          ".php"
+        ],
+        "aliases": [
+          "PHP",
+          "php"
+        ]
+      },
+      {
+        "id": "python",
+        "extensions": [
+          ".py"
+        ],
+        "aliases": [
+          "Python",
+          "python"
         ]
       }
     ]
