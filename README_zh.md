@@ -17,4 +17,6 @@
 
 ### 安装
 
-[Chinese Expression Diagnostic](https://marketplace.visualstudio.com/items?itemName=amlzq.csle-diagnostic)
+[IntelliJ 插件](https://plugins.jetbrains.com/plugin/26834-chinese-expression-inspection)
+
+[VSCode 扩展](https://marketplace.visualstudio.com/items?itemName=amlzq.csle-diagnostic)

@@ -1,6 +1,6 @@
 Language: English | [简体中文](./README_zh.md)
 
-It diagnoses whether the string literal expression contains Chinese characters and can quickly fix them between simplified or traditional glyphs.
+csle, short for "Chinese String Literal Expression", it diagnoses whether the string literal expression contains Chinese characters and can quickly fix them between simplified or traditional glyphs.
 
 If you don't want to inspect the strings in certain locations, such as: print, you can exclude them in the settings.
 
@@ -17,4 +17,6 @@ If you want more supported languages, new an issue.
 
 ### Installation
 
-[Chinese Expression Diagnostic](https://marketplace.visualstudio.com/items?itemName=amlzq.csle-diagnostic)
+[VSCode extension](https://marketplace.visualstudio.com/items?itemName=amlzq.csle-diagnostic)
+
+[IntelliJ plugin](https://plugins.jetbrains.com/plugin/26834-chinese-expression-inspection)
