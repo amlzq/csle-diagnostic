@@ -14,7 +14,7 @@ export function refreshPythonDiagnostics(doc: vscode.TextDocument, collection: v
     const diagnostics: vscode.Diagnostic[] = [];
     const matches = extractPythonStrings(doc);
 
-    const message = vscode.l10n.t('Contains {0} characters (expected {1})', toLabel(from), toLabel(to));
+    const message = vscode.l10n.t('Contains {0} (expected {1})', toLabel(from), toLabel(to));
 
     for (const { content, range } of matches) {
         if (!/[一-龥]/.test(content)) continue;

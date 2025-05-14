@@ -1,8 +1,8 @@
 {
-  "Contains {0} characters expected {1}": "字串包含{0}, 並轉換為{1}",
+  "Contains {0} (expected {1})": "字串包含{0}, 並轉換為{1}",
   "Convert to {0}": "轉換為{0}",
-  "Simplified": "簡體中文",
-  "Traditional(TW)": "台灣正體",
-  "Traditional(HK)": "香港繁體",
-  "Traditional": "繁體中文"
+  "Simplified Chinese": "簡體中文",
+  "Traditional Chinese (TW)": "正體中文（台灣）",
+  "Traditional Chinese (HK)": "繁體中文（香港）",
+  "Traditional Chinese": "繁體中文"
 }

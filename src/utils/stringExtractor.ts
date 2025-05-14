@@ -91,7 +91,6 @@ export function extractPythonStrings(doc: vscode.TextDocument): { content: strin
         const quoteLen = isTriple ? 3 : 1;
         const offset = isRaw ? 1 : 0;
         const content = raw.slice(offset + quoteLen, -quoteLen);
-        console.log('Extracted Python string:', content);
         result.push({
             content,
             range: new vscode.Range(doc.positionAt(start), doc.positionAt(end))

@@ -14,7 +14,7 @@ export function refreshDartDiagnostics(doc: vscode.TextDocument, collection: vsc
     const diagnostics: vscode.Diagnostic[] = [];
     const matches = extractDartStrings(doc);
 
-    const message = vscode.l10n.t('Contains {0} characters (expected {1})', toLabel(from), toLabel(to));
+    const message = vscode.l10n.t('Contains {0} (expected {1})', toLabel(from), toLabel(to));
 
     for (const { content, range } of matches) {
         if (!/[一-龥]/.test(content)) continue; // 判断是否包含中文

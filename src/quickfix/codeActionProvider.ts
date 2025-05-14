@@ -24,7 +24,7 @@ export class CsleCodeActionProvider implements vscode.CodeActionProvider {
             if (!fixed) continue;
 
             const action = new vscode.CodeAction(
-                vscode.l10n.t('Convert to {0} Chinese', convertGlyph),
+                vscode.l10n.t('Convert to {0}', convertGlyph),
                 vscode.CodeActionKind.QuickFix
             );
             action.edit = new vscode.WorkspaceEdit();
