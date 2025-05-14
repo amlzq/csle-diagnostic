@@ -1,10 +1,10 @@
 Language: English | [简体中文](./README_zh.md)
 
-csle, short for "Chinese String Literal Expression", it diagnoses whether the string literal expression contains Chinese characters and can quickly fix them between simplified or traditional glyphs.
+csle, short for "Chinese String Literal Expression", diagnoses whether the string literal expression contains Chinese characters, and can quickly fix them between simplified or traditional glyphs.
 
-If you don't want to inspect the strings in certain locations, such as: print, you can exclude them in the settings.
+In the extension settings view, you can exclude strings in certain locations, such as print, if you don't want to diagnose them.
 
-In the plugin settings view, you can modify the Chinese glyphs you want to inspect and the glyphs to quick fix.
+In the extension settings view, you can modify the Chinese characters glyphs you want to diagnose and the glyphs to quickly fix.
 
 ### Supported languages
 
