@@ -20,3 +20,7 @@ If you want more supported languages, new an issue.
 [VSCode extension](https://marketplace.visualstudio.com/items?itemName=amlzq.csle-diagnostic)
 
 [IntelliJ plugin](https://plugins.jetbrains.com/plugin/26834-chinese-expression-inspection)
+
+### Thanks
+
+[opencc-js](https://github.com/nk2028/opencc-js)
