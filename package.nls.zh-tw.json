@@ -2,7 +2,7 @@
   "cslediagnostic.display.name": "中文表達式診斷",
   "cslediagnostic.checkGlyph.desc": "選擇你想要檢查的中文字形",
   "cslediagnostic.convertGlyph.desc": "選擇你想要轉換的中文字形（不能與 檢查字形 相同）",
-  "cslediagnostic.excludeMethods.desc": "排除檢查的函數名稱或方法鏈（如 print，logger.debug 等）",
+  "cslediagnostic.excludeFunctions.desc": "排除檢查的函數名稱或方法鏈（如 print，logger.debug 等）",
   "cslediagnostic.simplified": "簡體中文",
   "cslediagnostic.simplified.desc": "檢查簡體中文",
   "cslediagnostic.traditional.tw": "正體中文（台灣）",
