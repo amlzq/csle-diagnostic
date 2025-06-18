@@ -13,7 +13,7 @@ In the extension settings view, you can modify the Chinese characters glyphs you
 - PHP
 - Python
 
-If you want more supported languages, new an issue.
+If you want more supported languages, new an [issue](https://github.com/amlzq/CsleInspection/issues).
 
 ### Installation
 

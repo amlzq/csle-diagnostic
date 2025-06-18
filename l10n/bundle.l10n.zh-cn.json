@@ -2,7 +2,7 @@
   "Contains {0} (expected {1})": "字符串包含{0}，转换为{1}。",
   "Convert to {0}": "转换为{0}。",
   "Simplified Chinese": "简体中文",
-  "Traditional Chinese (TW)": "正体中文（台湾）",
-  "Traditional Chinese (HK)": "繁体中文（香港）",
+  "Chinese (Taiwan)": "中文（台湾）",
+  "Chinese (Hong Kong)": "中文（香港）",
   "Traditional Chinese": "繁体中文"
 }

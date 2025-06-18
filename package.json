@@ -63,13 +63,13 @@
           ],
           "description": "%cslediagnostic.convertGlyph.desc%"
         },
-        "cslediagnostic.excludeFunctions": {
+        "cslediagnostic.excludeMethods": {
           "type": "array",
           "items": {
             "type": "string"
           },
           "default": [],
-          "description": "%cslediagnostic.excludeFunctions.desc%"
+          "description": "%cslediagnostic.excludeMethods.desc%"
         }
       }
     },

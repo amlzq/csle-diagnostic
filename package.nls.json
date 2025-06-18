@@ -2,13 +2,13 @@
   "cslediagnostic.display.name": "Chinese Expression Diagnostic",
   "cslediagnostic.checkGlyph.desc": "Select the Chinese glyph you want to check",
   "cslediagnostic.convertGlyph.desc": "Select the Chinese glyph you want to convert (not the same as check glyphs)",
-  "cslediagnostic.excludeFunctions.desc": "Exclude function names or method chains from checking (such as print, logger.debug, etc.)",
+  "cslediagnostic.excludeMethods.desc": "Exclude function names or method chains from checking (such as print, logger.debug, etc.)",
   "cslediagnostic.simplified": "Simplified Chinese",
   "cslediagnostic.simplified.desc": "Check for Simplified Chinese",
-  "cslediagnostic.traditional.tw": "Traditional Chinese (TW)",
-  "cslediagnostic.traditional.tw.desc": "Check for Traditional Chinese (as used in Taiwan)",
-  "cslediagnostic.traditional.hk": "Traditional Chinese (HK)",
-  "cslediagnostic.traditional.hk.desc": "Check for Traditional Chinese (as used in Hong Kong)",
+  "cslediagnostic.traditional.tw": "Chinese (Taiwan)",
+  "cslediagnostic.traditional.tw.desc": "Check for Chinese (as used in Taiwan)",
+  "cslediagnostic.traditional.hk": "Chinese (Hong Kong)",
+  "cslediagnostic.traditional.hk.desc": "Check for Chinese (as used in Hong Kong)",
   "cslediagnostic.traditional": "Traditional Chinese",
   "cslediagnostic.traditional.desc": "Check for Traditional Chinese"
 }

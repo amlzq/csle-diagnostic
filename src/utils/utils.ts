@@ -7,10 +7,10 @@ export function toLocale(glyph: string): OpenCC.Locale {
         case vscode.l10n.t('Simplified Chinese'):
             locale = 'cn';
             break;
-        case vscode.l10n.t('Traditional Chinese (TW)'):
+        case vscode.l10n.t('Chinese (Taiwan)'):
             locale = 'twp';
             break;
-        case vscode.l10n.t('Traditional Chinese (HK)'):
+        case vscode.l10n.t('Chinese (Hong Kong)'):
             locale = 'hk';
             break;
         case vscode.l10n.t('Traditional Chinese'):
@@ -30,10 +30,10 @@ export function toLabel(locale: OpenCC.Locale): string {
             label = vscode.l10n.t('Simplified Chinese');
             break;
         case 'twp':
-            label = vscode.l10n.t('Traditional Chinese (TW)');
+            label = vscode.l10n.t('Chinese (Taiwan)');
             break;
         case 'hk':
-            label = vscode.l10n.t('Traditional Chinese (HK)');
+            label = vscode.l10n.t('Chinese (Hong Kong)');
             break;
         case 't':
             label = vscode.l10n.t('Traditional Chinese');
