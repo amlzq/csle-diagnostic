@@ -43,6 +43,62 @@ export function extractJSStrings(doc: vscode.TextDocument): { content: string; r
     return result;
 }
 
+/**
+ * 提取 JSX / TSX 文件中的纯文本节点（排除 { 表达式 }）
+ */
+export function extractJSXStrings(doc: vscode.TextDocument): { content: string; range: vscode.Range }[] {
+    const text = doc.getText();
+    const result: { content: string; range: vscode.Range }[] = [];
+
+    // 匹配 JS/TS 字符串字面量表达式
+    const stringLiteralPattern = /(`[^`]*?`|"[^"\n]*"|'[^'\n]*')/g;
+    let stringLiteralMatch: RegExpExecArray | null;
+
+    while ((stringLiteralMatch = stringLiteralPattern.exec(text))) {
+        const start = stringLiteralMatch.index;
+        const lineText = doc.lineAt(doc.positionAt(start).line).text;
+        if (lineText.trimStart().startsWith('//')) {
+            continue;
+        }
+        const end = stringLiteralPattern.lastIndex;
+        const raw = stringLiteralMatch[0];
+        result.push({
+            content: raw.slice(1, -1),
+            range: new vscode.Range(doc.positionAt(start), doc.positionAt(end))
+        });
+    }
+
+    // 匹配 JSX 标签之间的内容：> ... <
+    // 使用非贪婪匹配 + 支持跨行
+    const tagAttrPattern = />[\s\S]*?</g;
+    let tagAttrMatch: RegExpExecArray | null;
+
+    while ((tagAttrMatch = tagAttrPattern.exec(text))) {
+        const raw = tagAttrMatch[0]; // 例如 ">中文<" 或 "> {t('按钮')} <"
+        const inner = raw.slice(1, -1).trim(); // 去掉前后的尖括号
+
+        // 跳过空白
+        if (!inner) continue;
+
+        // 跳过包含 { 表达式 } 的情况（React 动态内容）
+        if (/^{.*}$/.test(inner) || inner.includes('{')) continue;
+
+        // 跳过以注释开始的文本
+        const start = tagAttrMatch.index + 1;
+        const startPos = doc.positionAt(start);
+        const lineText = doc.lineAt(startPos.line).text;
+        if (lineText.trimStart().startsWith('//')) continue;
+
+        // 计算范围
+        const end = tagAttrMatch.index + tagAttrMatch[0].length - 1;
+        const range = new vscode.Range(doc.positionAt(start), doc.positionAt(end));
+
+        result.push({ content: inner, range });
+    }
+
+    return result;
+}
+
 export function extractPHPStrings(doc: vscode.TextDocument): { content: string; range: vscode.Range }[] {
     const text = doc.getText();
     const result: { content: string; range: vscode.Range }[] = [];

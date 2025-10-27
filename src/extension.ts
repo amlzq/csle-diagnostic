@@ -4,7 +4,7 @@ import * as vscode from 'vscode';
 import { refreshDiagnostics } from './diagnostics';
 import { CsleCodeActionProvider } from './quickfix/codeActionProvider';
 
-const languages = ['dart', 'javascript', 'typescript', 'php', 'python'];
+const languages = ['dart', 'javascript', 'typescript', 'php', 'python', 'javascriptreact', 'typescriptreact'];
 
 export function activate(context: vscode.ExtensionContext) {
     const diagnosticCollection = vscode.languages.createDiagnosticCollection('cslediagnostic');

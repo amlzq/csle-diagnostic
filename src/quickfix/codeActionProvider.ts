@@ -9,6 +9,7 @@ export class CsleCodeActionProvider implements vscode.CodeActionProvider {
         range: vscode.Range,
         context: vscode.CodeActionContext
     ): vscode.CodeAction[] {
+
         const actions: vscode.CodeAction[] = [];
 
         const { checkGlyph, convertGlyph, excludeMethods } = getUserConfig();
@@ -83,6 +84,7 @@ export class CsleCodeActionProvider implements vscode.CodeActionProvider {
             }
         }
 
-        return null; // fallback
+        // JSX/TSX
+        return converter(content);
     }
 }

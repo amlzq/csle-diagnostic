@@ -19,6 +19,8 @@
     "onLanguage:dart",
     "onLanguage:javascript",
     "onLanguage:typescript",
+    "onLanguage:javascriptreact",
+    "onLanguage:typescriptreact",
     "onLanguage:php",
     "onLanguage:python"
   ],
@@ -95,6 +97,16 @@
         ]
       },
       {
+        "id": "javascriptreact",
+        "extensions": [
+          ".jsx"
+        ],
+        "aliases": [
+          "JavaScript React",
+          "jsx"
+        ]
+      },
+      {
         "id": "typescript",
         "extensions": [
           ".ts"
@@ -102,6 +114,16 @@
         "aliases": [
           "TypeScript",
           "typescript"
+        ]
+      },
+      {
+        "id": "typescriptreact",
+        "extensions": [
+          ".tsx"
+        ],
+        "aliases": [
+          "TypeScript React",
+          "tsx"
         ]
       },
       {
