@@ -24,6 +24,12 @@ const ensureTreeSitterInitialized = async (): Promise<void> => {
     return treeSitterInitPromise;
 };
 
+export async function prewarmTreeSitterRuntime(): Promise<void> {
+    try {
+        await ensureTreeSitterInitialized();
+    } catch { }
+}
+
 const getDartParser = async (): Promise<any> => {
     if (dartParserPromise) return dartParserPromise;
     dartParserPromise = (async () => {

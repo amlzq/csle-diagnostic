@@ -3,6 +3,7 @@
 import * as vscode from 'vscode';
 import { refreshDiagnostics } from './diagnostics';
 import { CsleCodeActionProvider } from './quickfix/codeActionProvider';
+import { prewarmTreeSitterRuntime } from './utils/stringExtractor';
 
 const languages = ['dart', 'javascript', 'typescript', 'php', 'python', 'javascriptreact', 'typescriptreact'];
 
@@ -10,17 +11,44 @@ export function activate(context: vscode.ExtensionContext) {
     const diagnosticCollection = vscode.languages.createDiagnosticCollection('cslediagnostic');
     context.subscriptions.push(diagnosticCollection);
 
-    function trigger(doc: vscode.TextDocument) {
-        if (languages.includes(doc.languageId)) {
-            refreshDiagnostics(doc, diagnosticCollection);
-        }
+    const perDocState = new Map<string, { running: boolean; requestedVersion: number; doc: vscode.TextDocument }>();
+
+    function requestDiagnostics(doc: vscode.TextDocument) {
+        if (!languages.includes(doc.languageId)) return;
+
+        const key = doc.uri.toString();
+        const existing = perDocState.get(key);
+        const state = existing ?? { running: false, requestedVersion: doc.version, doc };
+        state.requestedVersion = doc.version;
+        state.doc = doc;
+        perDocState.set(key, state);
+
+        if (state.running) return;
+
+        void (async () => {
+            state.running = true;
+            try {
+                while (true) {
+                    const version = state.requestedVersion;
+                    const currentDoc = state.doc;
+                    await refreshDiagnostics(currentDoc, diagnosticCollection);
+                    if (state.requestedVersion === version) break;
+                }
+            } finally {
+                state.running = false;
+            }
+        })();
     }
 
     context.subscriptions.push(
-        vscode.workspace.onDidOpenTextDocument(trigger),
-        vscode.workspace.onDidChangeTextDocument(e => trigger(e.document)),
+        vscode.workspace.onDidOpenTextDocument(requestDiagnostics),
+        vscode.workspace.onDidChangeTextDocument(e => requestDiagnostics(e.document)),
         vscode.workspace.onDidChangeConfiguration(() => {
-            vscode.workspace.textDocuments.forEach(trigger);
+            vscode.workspace.textDocuments.forEach(requestDiagnostics);
+        }),
+        vscode.workspace.onDidCloseTextDocument(doc => {
+            perDocState.delete(doc.uri.toString());
+            diagnosticCollection.delete(doc.uri);
         })
     );
 
@@ -32,7 +60,11 @@ export function activate(context: vscode.ExtensionContext) {
         )
     );
 
-    vscode.workspace.textDocuments.forEach(trigger);
+    setTimeout(() => {
+        void prewarmTreeSitterRuntime();
+    }, 0);
+
+    vscode.workspace.textDocuments.forEach(requestDiagnostics);
 }
 
 export function deactivate() { }

@@ -4,17 +4,17 @@ import { refreshWebDiagnostics } from './js-ts-jsx-tsx';
 import { refreshPHPDiagnostics } from './php';
 import { refreshPythonDiagnostics } from './python';
 
-export function refreshDiagnostics(
+export async function refreshDiagnostics(
     doc: vscode.TextDocument,
     collection: vscode.DiagnosticCollection
-) {
+) : Promise<void> {
     if (doc.languageId === 'dart') {
-        void refreshDartDiagnostics(doc, collection);
+        await refreshDartDiagnostics(doc, collection);
     } else if (doc.languageId === 'javascript' || doc.languageId === 'typescript' || doc.languageId === 'javascriptreact' || doc.languageId === 'typescriptreact') {
         refreshWebDiagnostics(doc, collection);
     } else if (doc.languageId === 'php') {
-        void refreshPHPDiagnostics(doc, collection);
+        await refreshPHPDiagnostics(doc, collection);
     } else if (doc.languageId === 'python') {
-        void refreshPythonDiagnostics(doc, collection);
+        await refreshPythonDiagnostics(doc, collection);
     }
 }
