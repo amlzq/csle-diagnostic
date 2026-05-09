@@ -3,6 +3,17 @@ import { parse } from '@babel/parser';
 import traverse, { NodePath } from '@babel/traverse';
 import * as t from '@babel/types';
 
+const { Engine } = require('php-parser') as any;
+const phpEngine = new Engine({
+    parser: {
+        php7: true,
+        suppressErrors: true,
+    },
+    ast: {
+        withPositions: true,
+    },
+});
+
 export function extractDartStrings(doc: vscode.TextDocument): { content: string; range: vscode.Range }[] {
     const text = doc.getText();
     const result: { content: string; range: vscode.Range }[] = [];
@@ -101,30 +112,71 @@ export function extractWebStrings(doc: vscode.TextDocument): { content: string; 
 export function extractPHPStrings(doc: vscode.TextDocument): { content: string; range: vscode.Range }[] {
     const text = doc.getText();
     const result: { content: string; range: vscode.Range }[] = [];
-    const pattern = /("[^"\\\n]*"|'[^'\\\n]*'|<<<\s*(\w+)[\s\S]*?^\2;)/gm;
-    let match: RegExpExecArray | null;
-    while ((match = pattern.exec(text))) {
-        const start = match.index;
-        const lineText = doc.lineAt(doc.positionAt(start).line).text;
-        if (lineText.trimStart().startsWith('//')) {
-            continue;
-        }
-        const end = pattern.lastIndex;
-        const raw = match[0];
-        const quote = raw[0];
-        let content = '';
-        if (quote === '"' || quote === "'") {
-            content = raw.slice(1, -1);
-        } else if (raw.startsWith('<<<')) {
-            const lines = raw.split('\n');
-            const endIdx = lines.findIndex((line, i) => i > 0 && /^\w+;/.test(line.trim()));
-            if (endIdx > 0) content = lines.slice(1, endIdx).join('\n');
-        }
-        result.push({
-            content,
-            range: new vscode.Range(doc.positionAt(start), doc.positionAt(end))
-        });
+    let ast: any;
+    try {
+        ast = phpEngine.parseCode(text, doc.fileName);
+    } catch {
+        return result;
     }
+
+    const visited = new WeakSet<object>();
+
+    const getRangeFromLoc = (loc: any): vscode.Range | null => {
+        if (!loc?.start || !loc?.end) return null;
+
+        const startOffset = loc.start.offset;
+        const endOffset = loc.end.offset;
+        if (typeof startOffset === 'number' && typeof endOffset === 'number') {
+            return new vscode.Range(doc.positionAt(startOffset), doc.positionAt(endOffset));
+        }
+
+        const startLine = loc.start.line;
+        const startColumn = loc.start.column;
+        const endLine = loc.end.line;
+        const endColumn = loc.end.column;
+        if (
+            typeof startLine === 'number' &&
+            typeof startColumn === 'number' &&
+            typeof endLine === 'number' &&
+            typeof endColumn === 'number'
+        ) {
+            const start = new vscode.Position(Math.max(0, startLine - 1), Math.max(0, startColumn));
+            const end = new vscode.Position(Math.max(0, endLine - 1), Math.max(0, endColumn));
+            return new vscode.Range(start, end);
+        }
+        return null;
+    };
+
+    const visit = (node: any) => {
+        if (!node) return;
+        if (Array.isArray(node)) {
+            for (const item of node) visit(item);
+            return;
+        }
+        if (typeof node !== 'object') return;
+
+        if (visited.has(node)) return;
+        visited.add(node);
+
+        const kind = (node as any).kind;
+        if (kind === 'string' || kind === 'heredoc' || kind === 'nowdoc' || kind === 'encapsed') {
+            const range = getRangeFromLoc((node as any).loc);
+            if (range) {
+                result.push({
+                    content: doc.getText(range),
+                    range,
+                });
+            }
+        }
+
+        for (const value of Object.values(node as Record<string, unknown>)) {
+            if (value && (typeof value === 'object' || Array.isArray(value))) {
+                visit(value);
+            }
+        }
+    };
+
+    visit(ast);
     return result;
 }
 
