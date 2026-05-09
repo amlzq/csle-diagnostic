@@ -137,6 +137,17 @@ export async function extractDartStrings(doc: vscode.TextDocument): Promise<{ co
 export function extractWebStrings(doc: vscode.TextDocument): { content: string; range: vscode.Range }[] {
     const text = doc.getText();
     const result: { content: string; range: vscode.Range }[] = [];
+    const seen = new Set<string>();
+
+    const push = (content: string, start: number, end: number) => {
+        const key = `${start}:${end}`;
+        if (seen.has(key)) return;
+        seen.add(key);
+        result.push({
+            content,
+            range: new vscode.Range(doc.positionAt(start), doc.positionAt(end)),
+        });
+    };
 
     let ast: t.File;
     try {
@@ -162,33 +173,23 @@ export function extractWebStrings(doc: vscode.TextDocument): { content: string; 
             const value = path.node.value.trim();
             if (value && /[一-龥]/.test(value)) {
                 const [start, end] = path.node.range!;
-                result.push({
-                    content: value,
-                    range: new vscode.Range(doc.positionAt(start), doc.positionAt(end)),
-                });
+                push(value, start, end);
             }
         },
         JSXAttribute(path: NodePath<t.JSXAttribute>) {
             const val = path.node.value;
             if (val && val.type === 'StringLiteral' && /[一-龥]/.test(val.value)) {
                 const [start, end] = val.range!;
-                result.push({
-                    content: val.value,
-                    range: new vscode.Range(doc.positionAt(start), doc.positionAt(end)),
-                });
+                push(val.value, start, end);
             }
         },
         TemplateElement(path: NodePath<t.TemplateElement>) {
             const nodeRange = path.node.range;
             if (!nodeRange) return;
             const [start, end] = nodeRange;
-            const range = new vscode.Range(doc.positionAt(start), doc.positionAt(end));
-            const value = doc.getText(range);
+            const value = doc.getText(new vscode.Range(doc.positionAt(start), doc.positionAt(end)));
             if (value && /[一-龥]/.test(value)) {
-                result.push({
-                    content: value,
-                    range,
-                });
+                push(value, start, end);
             }
         },
         StringLiteral(path: NodePath<t.StringLiteral>) {
@@ -196,10 +197,7 @@ export function extractWebStrings(doc: vscode.TextDocument): { content: string; 
             const val = path.node.value;
             if (/[一-龥]/.test(val)) {
                 const [start, end] = path.node.range!;
-                result.push({
-                    content: val,
-                    range: new vscode.Range(doc.positionAt(start), doc.positionAt(end)),
-                });
+                push(val, start, end);
             }
         },
     });
