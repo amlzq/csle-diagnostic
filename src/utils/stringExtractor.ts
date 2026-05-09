@@ -1,7 +1,8 @@
-import * as vscode from 'vscode';
 import { parse } from '@babel/parser';
 import traverse, { NodePath } from '@babel/traverse';
 import * as t from '@babel/types';
+import { parser as pythonParser } from '@lezer/python';
+import * as vscode from 'vscode';
 
 const { Engine } = require('php-parser') as any;
 const phpEngine = new Engine({
@@ -183,25 +184,61 @@ export function extractPHPStrings(doc: vscode.TextDocument): { content: string; 
 export function extractPythonStrings(doc: vscode.TextDocument): { content: string; range: vscode.Range }[] {
     const text = doc.getText();
     const result: { content: string; range: vscode.Range }[] = [];
-    const pattern = /(?:r|R)?('''[\s\S]*?'''|"""[\s\S]*?"""|'[^'\n]*'|"[^"\n]*")/g;
-    let match: RegExpExecArray | null;
-    while ((match = pattern.exec(text))) {
-        const start = match.index;
-        const lineText = doc.lineAt(doc.positionAt(start).line).text;
-        if (lineText.trimStart().startsWith('#')) {
-            continue;
-        }
-        const end = pattern.lastIndex;
-        const raw = match[0];
-        const isTriple = raw.startsWith("'''") || raw.startsWith('"""') || raw.startsWith("r'''") || raw.startsWith('r"""');
-        const isRaw = raw.startsWith('r') || raw.startsWith('R');
-        const quoteLen = isTriple ? 3 : 1;
-        const offset = isRaw ? 1 : 0;
-        const content = raw.slice(offset + quoteLen, -quoteLen);
-        result.push({
-            content,
-            range: new vscode.Range(doc.positionAt(start), doc.positionAt(end))
-        });
+    let tree: any;
+    try {
+        tree = pythonParser.parse(text);
+    } catch {
+        return result;
     }
+
+    const addRange = (from: number, to: number) => {
+        if (from >= to) return;
+        const range = new vscode.Range(doc.positionAt(from), doc.positionAt(to));
+        result.push({ content: doc.getText(range), range });
+    };
+
+    const collectFormatReplacements = (node: any): { from: number; to: number }[] => {
+        const ranges: { from: number; to: number }[] = [];
+        const c = node.cursor();
+        const walkNode = () => {
+            if (c.name === 'FormatReplacement') {
+                ranges.push({ from: c.from, to: c.to });
+            }
+            if (c.firstChild()) {
+                do {
+                    walkNode();
+                } while (c.nextSibling());
+                c.parent();
+            }
+        };
+        walkNode();
+        return ranges;
+    };
+
+    const walk = (cursor: any) => {
+        if (cursor.name === 'String') {
+            addRange(cursor.from, cursor.to);
+        } else if (cursor.name === 'FormatString') {
+            const formatFrom = cursor.from;
+            const formatTo = cursor.to;
+
+            const repls = collectFormatReplacements(cursor.node).sort((a, b) => a.from - b.from);
+            let prev = formatFrom;
+            for (const r of repls) {
+                addRange(prev, Math.min(r.from, formatTo));
+                prev = Math.max(prev, Math.min(r.to, formatTo));
+            }
+            addRange(prev, formatTo);
+        }
+
+        if (cursor.firstChild()) {
+            do {
+                walk(cursor);
+            } while (cursor.nextSibling());
+            cursor.parent();
+        }
+    };
+
+    walk(tree.cursor());
     return result;
 }
