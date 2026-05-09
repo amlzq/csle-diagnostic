@@ -13,7 +13,7 @@ export function refreshDiagnostics(
     } else if (doc.languageId === 'javascript' || doc.languageId === 'typescript' || doc.languageId === 'javascriptreact' || doc.languageId === 'typescriptreact') {
         refreshWebDiagnostics(doc, collection);
     } else if (doc.languageId === 'php') {
-        refreshPHPDiagnostics(doc, collection);
+        void refreshPHPDiagnostics(doc, collection);
     } else if (doc.languageId === 'python') {
         void refreshPythonDiagnostics(doc, collection);
     }

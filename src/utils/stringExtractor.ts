@@ -7,6 +7,7 @@ import * as vscode from 'vscode';
 const WebTreeSitter = require('web-tree-sitter') as any;
 let treeSitterInitPromise: Promise<void> | null = null;
 let dartParserPromise: Promise<any> | null = null;
+let phpParserPromise: Promise<any> | null = null;
 let pythonParserPromise: Promise<any> | null = null;
 
 const getRootDir = (): string => path.resolve(__dirname, '../../');
@@ -39,6 +40,22 @@ const getDartParser = async (): Promise<any> => {
     return dartParserPromise;
 };
 
+const getPhpParser = async (): Promise<any> => {
+    if (phpParserPromise) return phpParserPromise;
+    phpParserPromise = (async () => {
+        const rootDir = getRootDir();
+        const phpLangWasmPath = path.join(rootDir, 'node_modules', 'tree-sitter-php', 'tree-sitter-php.wasm');
+
+        await ensureTreeSitterInitialized();
+
+        const lang = await WebTreeSitter.Language.load(phpLangWasmPath);
+        const parser = new WebTreeSitter.Parser();
+        parser.setLanguage(lang);
+        return parser;
+    })();
+    return phpParserPromise;
+};
+
 const getPythonParser = async (): Promise<any> => {
     if (pythonParserPromise) return pythonParserPromise;
     pythonParserPromise = (async () => {
@@ -54,17 +71,6 @@ const getPythonParser = async (): Promise<any> => {
     })();
     return pythonParserPromise;
 };
-
-const { Engine } = require('php-parser') as any;
-const phpEngine = new Engine({
-    parser: {
-        php7: true,
-        suppressErrors: true,
-    },
-    ast: {
-        withPositions: true,
-    },
-});
 
 export async function extractDartStrings(doc: vscode.TextDocument): Promise<{ content: string; range: vscode.Range }[]> {
     const text = doc.getText();
@@ -195,74 +201,52 @@ export function extractWebStrings(doc: vscode.TextDocument): { content: string; 
     return result;
 }
 
-export function extractPHPStrings(doc: vscode.TextDocument): { content: string; range: vscode.Range }[] {
+export async function extractPHPStrings(doc: vscode.TextDocument): Promise<{ content: string; range: vscode.Range }[]> {
     const text = doc.getText();
     const result: { content: string; range: vscode.Range }[] = [];
-    let ast: any;
+
+    let parser: any;
     try {
-        ast = phpEngine.parseCode(text, doc.fileName);
+        parser = await getPhpParser();
     } catch {
         return result;
     }
 
-    const visited = new WeakSet<object>();
+    let tree: any;
+    try {
+        tree = parser.parse(text);
+    } catch {
+        return result;
+    }
 
-    const getRangeFromLoc = (loc: any): vscode.Range | null => {
-        if (!loc?.start || !loc?.end) return null;
+    const addNodeRange = (node: any) => {
+        let start = node.startIndex;
+        let end = node.endIndex;
+        if (text[end] === ';') end += 1;
 
-        const startOffset = loc.start.offset;
-        const endOffset = loc.end.offset;
-        if (typeof startOffset === 'number' && typeof endOffset === 'number') {
-            return new vscode.Range(doc.positionAt(startOffset), doc.positionAt(endOffset));
-        }
-
-        const startLine = loc.start.line;
-        const startColumn = loc.start.column;
-        const endLine = loc.end.line;
-        const endColumn = loc.end.column;
-        if (
-            typeof startLine === 'number' &&
-            typeof startColumn === 'number' &&
-            typeof endLine === 'number' &&
-            typeof endColumn === 'number'
-        ) {
-            const start = new vscode.Position(Math.max(0, startLine - 1), Math.max(0, startColumn));
-            const end = new vscode.Position(Math.max(0, endLine - 1), Math.max(0, endColumn));
-            return new vscode.Range(start, end);
-        }
-        return null;
+        const range = new vscode.Range(doc.positionAt(start), doc.positionAt(end));
+        result.push({
+            content: doc.getText(range),
+            range,
+        });
     };
 
-    const visit = (node: any) => {
+    const shouldCaptureTypes = new Set(['string', 'encapsed_string', 'heredoc', 'nowdoc']);
+
+    const walk = (node: any) => {
         if (!node) return;
-        if (Array.isArray(node)) {
-            for (const item of node) visit(item);
+
+        if (shouldCaptureTypes.has(node.type)) {
+            addNodeRange(node);
             return;
         }
-        if (typeof node !== 'object') return;
 
-        if (visited.has(node)) return;
-        visited.add(node);
-
-        const kind = (node as any).kind;
-        if (kind === 'string' || kind === 'heredoc' || kind === 'nowdoc' || kind === 'encapsed') {
-            const range = getRangeFromLoc((node as any).loc);
-            if (range) {
-                result.push({
-                    content: doc.getText(range),
-                    range,
-                });
-            }
-        }
-
-        for (const value of Object.values(node as Record<string, unknown>)) {
-            if (value && (typeof value === 'object' || Array.isArray(value))) {
-                visit(value);
-            }
+        for (const child of node.namedChildren ?? []) {
+            walk(child);
         }
     };
 
-    visit(ast);
+    walk(tree.rootNode);
     return result;
 }
 
