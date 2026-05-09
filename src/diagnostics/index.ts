@@ -15,6 +15,6 @@ export function refreshDiagnostics(
     } else if (doc.languageId === 'php') {
         refreshPHPDiagnostics(doc, collection);
     } else if (doc.languageId === 'python') {
-        refreshPythonDiagnostics(doc, collection);
+        void refreshPythonDiagnostics(doc, collection);
     }
 }

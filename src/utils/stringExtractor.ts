@@ -1,23 +1,35 @@
 import { parse } from '@babel/parser';
 import traverse, { NodePath } from '@babel/traverse';
 import * as t from '@babel/types';
-import { parser as pythonParser } from '@lezer/python';
 import * as path from 'path';
 import * as vscode from 'vscode';
 
 const WebTreeSitter = require('web-tree-sitter') as any;
+let treeSitterInitPromise: Promise<void> | null = null;
 let dartParserPromise: Promise<any> | null = null;
+let pythonParserPromise: Promise<any> | null = null;
+
+const getRootDir = (): string => path.resolve(__dirname, '../../');
+
+const ensureTreeSitterInitialized = async (): Promise<void> => {
+    if (treeSitterInitPromise) return treeSitterInitPromise;
+    treeSitterInitPromise = (async () => {
+        const rootDir = getRootDir();
+        const treeSitterWasmPath = path.join(rootDir, 'node_modules', 'web-tree-sitter', 'tree-sitter.wasm');
+        await WebTreeSitter.Parser.init({
+            locateFile: () => treeSitterWasmPath,
+        });
+    })();
+    return treeSitterInitPromise;
+};
 
 const getDartParser = async (): Promise<any> => {
     if (dartParserPromise) return dartParserPromise;
     dartParserPromise = (async () => {
-        const rootDir = path.resolve(__dirname, '../../');
-        const treeSitterWasmPath = path.join(rootDir, 'node_modules', 'web-tree-sitter', 'tree-sitter.wasm');
+        const rootDir = getRootDir();
         const dartLangWasmPath = path.join(rootDir, 'node_modules', 'tree-sitter-dart', 'tree-sitter-dart.wasm');
 
-        await WebTreeSitter.Parser.init({
-            locateFile: () => treeSitterWasmPath,
-        });
+        await ensureTreeSitterInitialized();
 
         const lang = await WebTreeSitter.Language.load(dartLangWasmPath);
         const parser = new WebTreeSitter.Parser();
@@ -25,6 +37,22 @@ const getDartParser = async (): Promise<any> => {
         return parser;
     })();
     return dartParserPromise;
+};
+
+const getPythonParser = async (): Promise<any> => {
+    if (pythonParserPromise) return pythonParserPromise;
+    pythonParserPromise = (async () => {
+        const rootDir = getRootDir();
+        const pythonLangWasmPath = path.join(rootDir, 'node_modules', 'tree-sitter-python', 'tree-sitter-python.wasm');
+
+        await ensureTreeSitterInitialized();
+
+        const lang = await WebTreeSitter.Language.load(pythonLangWasmPath);
+        const parser = new WebTreeSitter.Parser();
+        parser.setLanguage(lang);
+        return parser;
+    })();
+    return pythonParserPromise;
 };
 
 const { Engine } = require('php-parser') as any;
@@ -238,64 +266,40 @@ export function extractPHPStrings(doc: vscode.TextDocument): { content: string; 
     return result;
 }
 
-export function extractPythonStrings(doc: vscode.TextDocument): { content: string; range: vscode.Range }[] {
+export async function extractPythonStrings(doc: vscode.TextDocument): Promise<{ content: string; range: vscode.Range }[]> {
     const text = doc.getText();
     const result: { content: string; range: vscode.Range }[] = [];
-    let tree: any;
+
+    let parser: any;
     try {
-        tree = pythonParser.parse(text);
+        parser = await getPythonParser();
     } catch {
         return result;
     }
 
-    const addRange = (from: number, to: number) => {
-        if (from >= to) return;
-        const range = new vscode.Range(doc.positionAt(from), doc.positionAt(to));
+    let tree: any;
+    try {
+        tree = parser.parse(text);
+    } catch {
+        return result;
+    }
+
+    const addRange = (start: number, end: number) => {
+        if (start >= end) return;
+        const range = new vscode.Range(doc.positionAt(start), doc.positionAt(end));
         result.push({ content: doc.getText(range), range });
     };
 
-    const collectFormatReplacements = (node: any): { from: number; to: number }[] => {
-        const ranges: { from: number; to: number }[] = [];
-        const c = node.cursor();
-        const walkNode = () => {
-            if (c.name === 'FormatReplacement') {
-                ranges.push({ from: c.from, to: c.to });
-            }
-            if (c.firstChild()) {
-                do {
-                    walkNode();
-                } while (c.nextSibling());
-                c.parent();
-            }
-        };
-        walkNode();
-        return ranges;
-    };
-
-    const walk = (cursor: any) => {
-        if (cursor.name === 'String') {
-            addRange(cursor.from, cursor.to);
-        } else if (cursor.name === 'FormatString') {
-            const formatFrom = cursor.from;
-            const formatTo = cursor.to;
-
-            const repls = collectFormatReplacements(cursor.node).sort((a, b) => a.from - b.from);
-            let prev = formatFrom;
-            for (const r of repls) {
-                addRange(prev, Math.min(r.from, formatTo));
-                prev = Math.max(prev, Math.min(r.to, formatTo));
-            }
-            addRange(prev, formatTo);
+    const walk = (node: any) => {
+        if (!node) return;
+        if (node.type === 'string_content') {
+            addRange(node.startIndex, node.endIndex);
         }
-
-        if (cursor.firstChild()) {
-            do {
-                walk(cursor);
-            } while (cursor.nextSibling());
-            cursor.parent();
+        for (const child of node.namedChildren ?? []) {
+            walk(child);
         }
     };
 
-    walk(tree.cursor());
+    walk(tree.rootNode);
     return result;
 }
