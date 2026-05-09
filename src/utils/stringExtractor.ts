@@ -2,7 +2,30 @@ import { parse } from '@babel/parser';
 import traverse, { NodePath } from '@babel/traverse';
 import * as t from '@babel/types';
 import { parser as pythonParser } from '@lezer/python';
+import * as path from 'path';
 import * as vscode from 'vscode';
+
+const WebTreeSitter = require('web-tree-sitter') as any;
+let dartParserPromise: Promise<any> | null = null;
+
+const getDartParser = async (): Promise<any> => {
+    if (dartParserPromise) return dartParserPromise;
+    dartParserPromise = (async () => {
+        const rootDir = path.resolve(__dirname, '../../');
+        const treeSitterWasmPath = path.join(rootDir, 'node_modules', 'web-tree-sitter', 'tree-sitter.wasm');
+        const dartLangWasmPath = path.join(rootDir, 'node_modules', 'tree-sitter-dart', 'tree-sitter-dart.wasm');
+
+        await WebTreeSitter.Parser.init({
+            locateFile: () => treeSitterWasmPath,
+        });
+
+        const lang = await WebTreeSitter.Language.load(dartLangWasmPath);
+        const parser = new WebTreeSitter.Parser();
+        parser.setLanguage(lang);
+        return parser;
+    })();
+    return dartParserPromise;
+};
 
 const { Engine } = require('php-parser') as any;
 const phpEngine = new Engine({
@@ -15,25 +38,59 @@ const phpEngine = new Engine({
     },
 });
 
-export function extractDartStrings(doc: vscode.TextDocument): { content: string; range: vscode.Range }[] {
+export async function extractDartStrings(doc: vscode.TextDocument): Promise<{ content: string; range: vscode.Range }[]> {
     const text = doc.getText();
     const result: { content: string; range: vscode.Range }[] = [];
-    const pattern = /("""[\s\S]*?"""|'''[\s\S]*?'''|"[^"\n]*"|'[^'\n]*')/g;
-    let match: RegExpExecArray | null;
-    while ((match = pattern.exec(text))) {
-        const start = match.index;
-        const lineText = doc.lineAt(doc.positionAt(start).line).text;
-        if (lineText.trimStart().startsWith('//')) {
-            continue;
-        }
-        const end = pattern.lastIndex;
-        const raw = match[0];
-        const quoteLen = raw.startsWith('"""') || raw.startsWith("'''") ? 3 : 1;
-        result.push({
-            content: raw.slice(quoteLen, -quoteLen),
-            range: new vscode.Range(doc.positionAt(start), doc.positionAt(end))
-        });
+
+    let parser: any;
+    try {
+        parser = await getDartParser();
+    } catch {
+        return result;
     }
+
+    let tree: any;
+    try {
+        tree = parser.parse(text);
+    } catch {
+        return result;
+    }
+
+    const stripDartString = (raw: string): string => {
+        if (!raw) return raw;
+        const prefixLen = raw[0] === 'r' ? 1 : 0;
+        const triple = raw.slice(prefixLen, prefixLen + 3);
+        const quoteLen =
+            triple === "'''" || triple === '"""'
+                ? 3
+                : raw[prefixLen] === "'" || raw[prefixLen] === '"'
+                    ? 1
+                    : 0;
+        if (quoteLen === 0) return raw;
+        if (raw.length < prefixLen + quoteLen * 2) return raw;
+        return raw.slice(prefixLen + quoteLen, raw.length - quoteLen);
+    };
+
+    const walk = (node: any) => {
+        if (!node) return;
+
+        if (node.type === 'string_literal') {
+            const start = node.startIndex;
+            const end = node.endIndex;
+            const range = new vscode.Range(doc.positionAt(start), doc.positionAt(end));
+            const raw = doc.getText(range);
+            result.push({
+                content: stripDartString(raw),
+                range,
+            });
+        }
+
+        for (const child of node.namedChildren ?? []) {
+            walk(child);
+        }
+    };
+
+    walk(tree.rootNode);
     return result;
 }
 

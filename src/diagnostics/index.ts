@@ -9,7 +9,7 @@ export function refreshDiagnostics(
     collection: vscode.DiagnosticCollection
 ) {
     if (doc.languageId === 'dart') {
-        refreshDartDiagnostics(doc, collection);
+        void refreshDartDiagnostics(doc, collection);
     } else if (doc.languageId === 'javascript' || doc.languageId === 'typescript' || doc.languageId === 'javascriptreact' || doc.languageId === 'typescriptreact') {
         refreshWebDiagnostics(doc, collection);
     } else if (doc.languageId === 'php') {
