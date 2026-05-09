@@ -1,18 +1,18 @@
 import * as vscode from 'vscode';
 import * as OpenCC from 'opencc-js';
 import { getUserConfig } from '../utils/config';
-import { extractJSXStrings } from '../utils/stringExtractor';
+import { extractWebStrings } from '../utils/stringExtractor';
 import { shouldExclude } from '../utils/excludeMethods';
 import { toLocale, toLabel } from '../utils/utils';
 
-export function refreshJSXTSXDiagnostics(doc: vscode.TextDocument, collection: vscode.DiagnosticCollection) {
+export function refreshWebDiagnostics(doc: vscode.TextDocument, collection: vscode.DiagnosticCollection) {
     const { checkGlyph, convertGlyph, excludeMethods } = getUserConfig();
     const from: OpenCC.Locale = toLocale(checkGlyph);
     const to: OpenCC.Locale = toLocale(convertGlyph);
     const converter = OpenCC.Converter({ from: from, to: to });
 
     const diagnostics: vscode.Diagnostic[] = [];
-    const matches = extractJSXStrings(doc);
+    const matches = extractWebStrings(doc);
 
     const message = vscode.l10n.t('Contains {0} (expected {1})', toLabel(from), toLabel(to));
 

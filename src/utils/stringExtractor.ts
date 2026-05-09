@@ -1,4 +1,7 @@
 import * as vscode from 'vscode';
+import { parse } from '@babel/parser';
+import traverse, { NodePath } from '@babel/traverse';
+import * as t from '@babel/types';
 
 export function extractDartStrings(doc: vscode.TextDocument): { content: string; range: vscode.Range }[] {
     const text = doc.getText();
@@ -22,79 +25,75 @@ export function extractDartStrings(doc: vscode.TextDocument): { content: string;
     return result;
 }
 
-export function extractJSStrings(doc: vscode.TextDocument): { content: string; range: vscode.Range }[] {
-    const text = doc.getText();
-    const result: { content: string; range: vscode.Range }[] = [];
-    const pattern = /(`[^`]*?`|"[^"\n]*"|'[^'\n]*')/g;
-    let match: RegExpExecArray | null;
-    while ((match = pattern.exec(text))) {
-        const start = match.index;
-        const lineText = doc.lineAt(doc.positionAt(start).line).text;
-        if (lineText.trimStart().startsWith('//')) {
-            continue;
-        }
-        const end = pattern.lastIndex;
-        const raw = match[0];
-        result.push({
-            content: raw.slice(1, -1),
-            range: new vscode.Range(doc.positionAt(start), doc.positionAt(end))
-        });
-    }
-    return result;
-}
-
-/**
- * 提取 JSX / TSX 文件中的纯文本节点（排除 { 表达式 }）
- */
-export function extractJSXStrings(doc: vscode.TextDocument): { content: string; range: vscode.Range }[] {
+export function extractWebStrings(doc: vscode.TextDocument): { content: string; range: vscode.Range }[] {
     const text = doc.getText();
     const result: { content: string; range: vscode.Range }[] = [];
 
-    // 匹配 JS/TS 字符串字面量表达式
-    const stringLiteralPattern = /(`[^`]*?`|"[^"\n]*"|'[^'\n]*')/g;
-    let stringLiteralMatch: RegExpExecArray | null;
-
-    while ((stringLiteralMatch = stringLiteralPattern.exec(text))) {
-        const start = stringLiteralMatch.index;
-        const lineText = doc.lineAt(doc.positionAt(start).line).text;
-        if (lineText.trimStart().startsWith('//')) {
-            continue;
-        }
-        const end = stringLiteralPattern.lastIndex;
-        const raw = stringLiteralMatch[0];
-        result.push({
-            content: raw.slice(1, -1),
-            range: new vscode.Range(doc.positionAt(start), doc.positionAt(end))
-        });
+    let ast: t.File;
+    try {
+        ast = parse(text, {
+            sourceType: 'module',
+            plugins: [
+                'jsx',
+                'typescript', // 支持 tsx
+                'classProperties',
+                'objectRestSpread',
+                'decorators-legacy',
+            ],
+            ranges: true,
+            errorRecovery: true,
+        }) as unknown as t.File;
+    } catch (e) {
+        console.warn('AST parse error:', e);
+        return result;
     }
 
-    // 匹配 JSX 标签之间的内容：> ... <
-    // 使用非贪婪匹配 + 支持跨行
-    const tagAttrPattern = />[\s\S]*?</g;
-    let tagAttrMatch: RegExpExecArray | null;
-
-    while ((tagAttrMatch = tagAttrPattern.exec(text))) {
-        const raw = tagAttrMatch[0]; // 例如 ">中文<" 或 "> {t('按钮')} <"
-        const inner = raw.slice(1, -1).trim(); // 去掉前后的尖括号
-
-        // 跳过空白
-        if (!inner) continue;
-
-        // 跳过包含 { 表达式 } 的情况（React 动态内容）
-        if (/^{.*}$/.test(inner) || inner.includes('{')) continue;
-
-        // 跳过以注释开始的文本
-        const start = tagAttrMatch.index + 1;
-        const startPos = doc.positionAt(start);
-        const lineText = doc.lineAt(startPos.line).text;
-        if (lineText.trimStart().startsWith('//')) continue;
-
-        // 计算范围
-        const end = tagAttrMatch.index + tagAttrMatch[0].length - 1;
-        const range = new vscode.Range(doc.positionAt(start), doc.positionAt(end));
-
-        result.push({ content: inner, range });
-    }
+    traverse(ast, {
+        JSXText(path: NodePath<t.JSXText>) {
+            const value = path.node.value.trim();
+            if (value && /[一-龥]/.test(value)) {
+                const [start, end] = path.node.range!;
+                result.push({
+                    content: value,
+                    range: new vscode.Range(doc.positionAt(start), doc.positionAt(end)),
+                });
+            }
+        },
+        JSXAttribute(path: NodePath<t.JSXAttribute>) {
+            const val = path.node.value;
+            if (val && val.type === 'StringLiteral' && /[一-龥]/.test(val.value)) {
+                const [start, end] = val.range!;
+                result.push({
+                    content: val.value,
+                    range: new vscode.Range(doc.positionAt(start), doc.positionAt(end)),
+                });
+            }
+        },
+        TemplateElement(path: NodePath<t.TemplateElement>) {
+            const nodeRange = path.node.range;
+            if (!nodeRange) return;
+            const [start, end] = nodeRange;
+            const range = new vscode.Range(doc.positionAt(start), doc.positionAt(end));
+            const value = doc.getText(range);
+            if (value && /[一-龥]/.test(value)) {
+                result.push({
+                    content: value,
+                    range,
+                });
+            }
+        },
+        StringLiteral(path: NodePath<t.StringLiteral>) {
+            // 可选：提取 JSX 外部字符串
+            const val = path.node.value;
+            if (/[一-龥]/.test(val)) {
+                const [start, end] = path.node.range!;
+                result.push({
+                    content: val,
+                    range: new vscode.Range(doc.positionAt(start), doc.positionAt(end)),
+                });
+            }
+        },
+    });
 
     return result;
 }
