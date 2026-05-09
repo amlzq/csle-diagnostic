@@ -1,3 +1,7 @@
+# 0.0.4
+
+- Improve parser initialization stability for Dart / PHP / Python (tree-sitter runtime prewarm + error recovery).
+
 # 0.0.3
 
 - Support checking and converting tag attribute values in JSX/TSX files.
