@@ -33,6 +33,7 @@
       "properties": {
         "cslediagnostic.checkGlyph": {
           "type": "string",
+          "order": 1,
           "default": "%cslediagnostic.simplified%",
           "enum": [
             "%cslediagnostic.simplified%",
@@ -50,6 +51,7 @@
         },
         "cslediagnostic.convertGlyph": {
           "type": "string",
+          "order": 2,
           "default": "%cslediagnostic.traditional.tw%",
           "enum": [
             "%cslediagnostic.simplified%",
@@ -65,8 +67,23 @@
           ],
           "description": "%cslediagnostic.convertGlyph.desc%"
         },
+        "cslediagnostic.checkLiteralExpression": {
+          "type": "boolean",
+          "order": 3,
+          "default": true,
+          "title": "%cslediagnostic.checkLiteralExpression.title%",
+          "description": "%cslediagnostic.checkLiteralExpression.desc%"
+        },
+        "cslediagnostic.checkDocComment": {
+          "type": "boolean",
+          "order": 4,
+          "default": false,
+          "title": "%cslediagnostic.checkDocComment.title%",
+          "description": "%cslediagnostic.checkDocComment.desc%"
+        },
         "cslediagnostic.excludeMethods": {
           "type": "array",
+          "order": 5,
           "items": {
             "type": "string"
           },

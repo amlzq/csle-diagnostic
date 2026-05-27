@@ -1,5 +1,5 @@
-import * as vscode from 'vscode';
 import * as OpenCC from 'opencc-js';
+import * as vscode from 'vscode';
 
 export function toLocale(glyph: string): OpenCC.Locale {
     let locale: OpenCC.Locale;

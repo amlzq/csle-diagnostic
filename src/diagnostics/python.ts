@@ -1,19 +1,22 @@
-import * as vscode from 'vscode';
 import * as OpenCC from 'opencc-js';
+import * as vscode from 'vscode';
 import { getUserConfig } from '../utils/config';
-import { extractPythonStrings } from '../utils/stringExtractor';
 import { shouldExclude } from '../utils/excludeMethods';
-import { toLocale, toLabel } from '../utils/utils';
+import { extractPythonStrings } from '../utils/stringExtractor';
+import { toLabel, toLocale } from '../utils/utils';
 
 export async function refreshPythonDiagnostics(doc: vscode.TextDocument, collection: vscode.DiagnosticCollection) {
     const docVersion = doc.version;
-    const { checkGlyph, convertGlyph, excludeMethods } = getUserConfig();
+    const { checkGlyph, convertGlyph, excludeMethods, checkLiteralExpression, checkDocComment } = getUserConfig();
     const from: OpenCC.Locale = toLocale(checkGlyph);
     const to: OpenCC.Locale = toLocale(convertGlyph);
     const converter = OpenCC.Converter({ from: from, to: to });
 
     const diagnostics: vscode.Diagnostic[] = [];
-    const matches = await extractPythonStrings(doc);
+    const matches = await extractPythonStrings(doc, {
+        includeLiteralExpression: checkLiteralExpression,
+        includeDocComment: checkDocComment,
+    });
 
     const message = vscode.l10n.t('Contains {0} (expected {1})', toLabel(from), toLabel(to));
 

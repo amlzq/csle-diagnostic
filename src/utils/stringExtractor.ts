@@ -10,6 +10,18 @@ let dartParserPromise: Promise<any> | null = null;
 let phpParserPromise: Promise<any> | null = null;
 let pythonParserPromise: Promise<any> | null = null;
 
+export type ExtractOptions = {
+    includeLiteralExpression?: boolean;
+    includeDocComment?: boolean;
+};
+
+const normalizeOptions = (options?: ExtractOptions) => {
+    return {
+        includeLiteralExpression: options?.includeLiteralExpression ?? true,
+        includeDocComment: options?.includeDocComment ?? false,
+    };
+};
+
 const getRootDir = (): string => path.resolve(__dirname, '../../');
 
 const ensureTreeSitterInitialized = async (): Promise<void> => {
@@ -78,9 +90,13 @@ const getPythonParser = async (): Promise<any> => {
     return pythonParserPromise;
 };
 
-export async function extractDartStrings(doc: vscode.TextDocument): Promise<{ content: string; range: vscode.Range }[]> {
+export async function extractDartStrings(
+    doc: vscode.TextDocument,
+    options?: ExtractOptions
+): Promise<{ content: string; range: vscode.Range }[]> {
     const text = doc.getText();
     const result: { content: string; range: vscode.Range }[] = [];
+    const { includeLiteralExpression, includeDocComment } = normalizeOptions(options);
 
     let parser: any;
     try {
@@ -114,7 +130,7 @@ export async function extractDartStrings(doc: vscode.TextDocument): Promise<{ co
     const walk = (node: any) => {
         if (!node) return;
 
-        if (node.type === 'string_literal') {
+        if (includeLiteralExpression && node.type === 'string_literal') {
             const start = node.startIndex;
             const end = node.endIndex;
             const range = new vscode.Range(doc.positionAt(start), doc.positionAt(end));
@@ -125,7 +141,17 @@ export async function extractDartStrings(doc: vscode.TextDocument): Promise<{ co
             });
         }
 
-        for (const child of node.namedChildren ?? []) {
+        if (includeDocComment && typeof node.type === 'string' && node.type.includes('comment')) {
+            const start = node.startIndex;
+            const end = node.endIndex;
+            const range = new vscode.Range(doc.positionAt(start), doc.positionAt(end));
+            const raw = doc.getText(range);
+            if (raw.startsWith('///') || raw.startsWith('/**')) {
+                result.push({ content: raw, range });
+            }
+        }
+
+        for (const child of node.children ?? []) {
             walk(child);
         }
     };
@@ -134,10 +160,14 @@ export async function extractDartStrings(doc: vscode.TextDocument): Promise<{ co
     return result;
 }
 
-export function extractWebStrings(doc: vscode.TextDocument): { content: string; range: vscode.Range }[] {
+export function extractWebStrings(
+    doc: vscode.TextDocument,
+    options?: ExtractOptions
+): { content: string; range: vscode.Range }[] {
     const text = doc.getText();
     const result: { content: string; range: vscode.Range }[] = [];
     const seen = new Set<string>();
+    const { includeLiteralExpression, includeDocComment } = normalizeOptions(options);
 
     const push = (content: string, start: number, end: number) => {
         const key = `${start}:${end}`;
@@ -170,6 +200,7 @@ export function extractWebStrings(doc: vscode.TextDocument): { content: string; 
 
     traverse(ast, {
         JSXText(path: NodePath<t.JSXText>) {
+            if (!includeLiteralExpression) return;
             const value = path.node.value.trim();
             if (value && /[一-龥]/.test(value)) {
                 const [start, end] = path.node.range!;
@@ -177,6 +208,7 @@ export function extractWebStrings(doc: vscode.TextDocument): { content: string; 
             }
         },
         JSXAttribute(path: NodePath<t.JSXAttribute>) {
+            if (!includeLiteralExpression) return;
             const val = path.node.value;
             if (val && val.type === 'StringLiteral' && /[一-龥]/.test(val.value)) {
                 const [start, end] = val.range!;
@@ -184,6 +216,7 @@ export function extractWebStrings(doc: vscode.TextDocument): { content: string; 
             }
         },
         TemplateElement(path: NodePath<t.TemplateElement>) {
+            if (!includeLiteralExpression) return;
             const nodeRange = path.node.range;
             if (!nodeRange) return;
             const [start, end] = nodeRange;
@@ -193,6 +226,7 @@ export function extractWebStrings(doc: vscode.TextDocument): { content: string; 
             }
         },
         StringLiteral(path: NodePath<t.StringLiteral>) {
+            if (!includeLiteralExpression) return;
             // 可选：提取 JSX 外部字符串
             const val = path.node.value;
             if (/[一-龥]/.test(val)) {
@@ -202,12 +236,29 @@ export function extractWebStrings(doc: vscode.TextDocument): { content: string; 
         },
     });
 
+    if (includeDocComment) {
+        for (const c of ast.comments ?? []) {
+            if (c.type !== 'CommentBlock') continue;
+            const start = (c as any).start as number | undefined;
+            const end = (c as any).end as number | undefined;
+            if (typeof start !== 'number' || typeof end !== 'number') continue;
+            const raw = doc.getText(new vscode.Range(doc.positionAt(start), doc.positionAt(end)));
+            if (raw.startsWith('/**')) {
+                push(raw, start, end);
+            }
+        }
+    }
+
     return result;
 }
 
-export async function extractPHPStrings(doc: vscode.TextDocument): Promise<{ content: string; range: vscode.Range }[]> {
+export async function extractPHPStrings(
+    doc: vscode.TextDocument,
+    options?: ExtractOptions
+): Promise<{ content: string; range: vscode.Range }[]> {
     const text = doc.getText();
     const result: { content: string; range: vscode.Range }[] = [];
+    const { includeLiteralExpression, includeDocComment } = normalizeOptions(options);
 
     let parser: any;
     try {
@@ -240,12 +291,19 @@ export async function extractPHPStrings(doc: vscode.TextDocument): Promise<{ con
     const walk = (node: any) => {
         if (!node) return;
 
-        if (shouldCaptureTypes.has(node.type)) {
+        if (includeLiteralExpression && shouldCaptureTypes.has(node.type)) {
             addNodeRange(node);
-            return;
+        } else if (includeDocComment && node.type === 'comment') {
+            const start = node.startIndex;
+            const end = node.endIndex;
+            const range = new vscode.Range(doc.positionAt(start), doc.positionAt(end));
+            const raw = doc.getText(range);
+            if (raw.startsWith('/**')) {
+                result.push({ content: raw, range });
+            }
         }
 
-        for (const child of node.namedChildren ?? []) {
+        for (const child of node.children ?? []) {
             walk(child);
         }
     };
@@ -254,9 +312,13 @@ export async function extractPHPStrings(doc: vscode.TextDocument): Promise<{ con
     return result;
 }
 
-export async function extractPythonStrings(doc: vscode.TextDocument): Promise<{ content: string; range: vscode.Range }[]> {
+export async function extractPythonStrings(
+    doc: vscode.TextDocument,
+    options?: ExtractOptions
+): Promise<{ content: string; range: vscode.Range }[]> {
     const text = doc.getText();
     const result: { content: string; range: vscode.Range }[] = [];
+    const { includeLiteralExpression, includeDocComment } = normalizeOptions(options);
 
     let parser: any;
     try {
@@ -278,16 +340,68 @@ export async function extractPythonStrings(doc: vscode.TextDocument): Promise<{ 
         result.push({ content: doc.getText(range), range });
     };
 
+    const docstringContentRanges = new Set<string>();
+
+    const collectStringContentRanges = (node: any) => {
+        if (!node) return;
+        if (node.type === 'string_content') {
+            docstringContentRanges.add(`${node.startIndex}:${node.endIndex}`);
+        }
+        for (const child of node.namedChildren ?? []) {
+            collectStringContentRanges(child);
+        }
+    };
+
+    const collectDocstrings = (node: any) => {
+        if (!node) return;
+
+        const maybeAddDocstringFromBody = (bodyNode: any) => {
+            if (!bodyNode) return;
+            const firstStmt = (bodyNode.namedChildren ?? [])[0];
+            if (!firstStmt || firstStmt.type !== 'expression_statement') return;
+            const firstExpr = (firstStmt.namedChildren ?? [])[0];
+            if (!firstExpr || firstExpr.type !== 'string') return;
+            collectStringContentRanges(firstExpr);
+        };
+
+        if (node.type === 'module') {
+            maybeAddDocstringFromBody(node);
+        } else if (node.type === 'function_definition' || node.type === 'class_definition') {
+            const bodyNode =
+                typeof node.childForFieldName === 'function'
+                    ? node.childForFieldName('body')
+                    : (node.namedChildren ?? []).find((c: any) => c.type === 'block');
+            maybeAddDocstringFromBody(bodyNode);
+        }
+
+        for (const child of node.namedChildren ?? []) {
+            if (child.type === 'function_definition' || child.type === 'class_definition') {
+                collectDocstrings(child);
+            } else if (child.type === 'module') {
+                collectDocstrings(child);
+            } else {
+                collectDocstrings(child);
+            }
+        }
+    };
+
     const walk = (node: any) => {
         if (!node) return;
         if (node.type === 'string_content') {
-            addRange(node.startIndex, node.endIndex);
+            const key = `${node.startIndex}:${node.endIndex}`;
+            const isDocstring = docstringContentRanges.has(key);
+            if (isDocstring ? includeDocComment : includeLiteralExpression) {
+                addRange(node.startIndex, node.endIndex);
+            }
         }
         for (const child of node.namedChildren ?? []) {
             walk(child);
         }
     };
 
-    walk(tree.rootNode);
+    collectDocstrings(tree.rootNode);
+    if (includeLiteralExpression || includeDocComment) {
+        walk(tree.rootNode);
+    }
     return result;
 }

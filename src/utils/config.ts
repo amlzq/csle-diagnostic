@@ -5,6 +5,8 @@ export function getUserConfig() {
     return {
         checkGlyph: config.get<string>('checkGlyph', vscode.l10n.t('Simplified Chinese')),
         convertGlyph: config.get<string>('convertGlyph', vscode.l10n.t('Chinese (Taiwan)')),
+        checkLiteralExpression: config.get<boolean>('checkLiteralExpression', true),
+        checkDocComment: config.get<boolean>('checkDocComment', false),
         excludeMethods: config.get<string[]>('excludeMethods', []),
     };
 }

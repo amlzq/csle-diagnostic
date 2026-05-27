@@ -1,5 +1,5 @@
-import * as vscode from 'vscode';
 import * as OpenCC from 'opencc-js';
+import * as vscode from 'vscode';
 import { getUserConfig } from '../utils/config';
 import { toLocale } from '../utils/utils';
 

@@ -7,7 +7,7 @@ import { refreshPythonDiagnostics } from './python';
 export async function refreshDiagnostics(
     doc: vscode.TextDocument,
     collection: vscode.DiagnosticCollection
-) : Promise<void> {
+): Promise<void> {
     if (doc.languageId === 'dart') {
         await refreshDartDiagnostics(doc, collection);
     } else if (doc.languageId === 'javascript' || doc.languageId === 'typescript' || doc.languageId === 'javascriptreact' || doc.languageId === 'typescriptreact') {
