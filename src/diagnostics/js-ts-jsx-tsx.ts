@@ -6,7 +6,7 @@ import { extractWebStrings } from '../utils/stringExtractor';
 import { toLabel, toLocale } from '../utils/utils';
 
 export function refreshWebDiagnostics(doc: vscode.TextDocument, collection: vscode.DiagnosticCollection) {
-    const { checkGlyph, convertGlyph, excludeMethods, checkLiteralExpression, checkDocComment } = getUserConfig();
+    const { checkGlyph, convertGlyph, excludeMethods, checkLiteralExpression, checkDocComment } = getUserConfig(doc);
     const from: OpenCC.Locale = toLocale(checkGlyph);
     const to: OpenCC.Locale = toLocale(convertGlyph);
     const converter = OpenCC.Converter({ from: from, to: to });

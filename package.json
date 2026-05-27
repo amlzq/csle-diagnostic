@@ -84,6 +84,7 @@
         "cslediagnostic.excludeMethods": {
           "type": "array",
           "order": 5,
+          "scope": "language-overridable",
           "items": {
             "type": "string"
           },

@@ -12,7 +12,7 @@ export class CsleCodeActionProvider implements vscode.CodeActionProvider {
 
         const actions: vscode.CodeAction[] = [];
 
-        const { checkGlyph, convertGlyph, excludeMethods } = getUserConfig();
+        const { checkGlyph, convertGlyph } = getUserConfig(document);
         const from: OpenCC.Locale = toLocale(checkGlyph);
         const to: OpenCC.Locale = toLocale(convertGlyph);
         const converter = OpenCC.Converter({ from: from, to: to });
