@@ -21,6 +21,8 @@
     "onLanguage:typescript",
     "onLanguage:javascriptreact",
     "onLanguage:typescriptreact",
+    "onLanguage:html",
+    "onLanguage:css",
     "onLanguage:php",
     "onLanguage:python"
   ],
@@ -145,6 +147,27 @@
         ]
       },
       {
+        "id": "html",
+        "extensions": [
+          ".html",
+          ".htm"
+        ],
+        "aliases": [
+          "HTML",
+          "html"
+        ]
+      },
+      {
+        "id": "css",
+        "extensions": [
+          ".css"
+        ],
+        "aliases": [
+          "CSS",
+          "css"
+        ]
+      },
+      {
         "id": "php",
         "extensions": [
           ".php"
@@ -193,6 +216,8 @@
     "@types/opencc-js": "^1.0.3",
     "opencc-js": "^1.3.0",
     "tree-sitter-dart": "^1.0.0",
+    "tree-sitter-css": "^0.23.2",
+    "tree-sitter-html": "^0.23.2",
     "tree-sitter-php": "^0.24.2",
     "tree-sitter-python": "^0.25.0",
     "web-tree-sitter": "^0.25.10",

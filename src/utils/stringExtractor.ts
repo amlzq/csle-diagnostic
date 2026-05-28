@@ -7,6 +7,8 @@ import * as vscode from 'vscode';
 const WebTreeSitter = require('web-tree-sitter') as any;
 let treeSitterInitPromise: Promise<void> | null = null;
 let dartParserPromise: Promise<any> | null = null;
+let htmlParserPromise: Promise<any> | null = null;
+let cssParserPromise: Promise<any> | null = null;
 let phpParserPromise: Promise<any> | null = null;
 let pythonParserPromise: Promise<any> | null = null;
 
@@ -72,6 +74,38 @@ const getPhpParser = async (): Promise<any> => {
         return parser;
     })();
     return phpParserPromise;
+};
+
+const getHtmlParser = async (): Promise<any> => {
+    if (htmlParserPromise) return htmlParserPromise;
+    htmlParserPromise = (async () => {
+        const rootDir = getRootDir();
+        const htmlLangWasmPath = path.join(rootDir, 'node_modules', 'tree-sitter-html', 'tree-sitter-html.wasm');
+
+        await ensureTreeSitterInitialized();
+
+        const lang = await WebTreeSitter.Language.load(htmlLangWasmPath);
+        const parser = new WebTreeSitter.Parser();
+        parser.setLanguage(lang);
+        return parser;
+    })();
+    return htmlParserPromise;
+};
+
+const getCssParser = async (): Promise<any> => {
+    if (cssParserPromise) return cssParserPromise;
+    cssParserPromise = (async () => {
+        const rootDir = getRootDir();
+        const cssLangWasmPath = path.join(rootDir, 'node_modules', 'tree-sitter-css', 'tree-sitter-css.wasm');
+
+        await ensureTreeSitterInitialized();
+
+        const lang = await WebTreeSitter.Language.load(cssLangWasmPath);
+        const parser = new WebTreeSitter.Parser();
+        parser.setLanguage(lang);
+        return parser;
+    })();
+    return cssParserPromise;
 };
 
 const getPythonParser = async (): Promise<any> => {
@@ -249,6 +283,120 @@ export function extractWebStrings(
         }
     }
 
+    return result;
+}
+
+export async function extractHtmlStrings(
+    doc: vscode.TextDocument,
+    options?: ExtractOptions
+): Promise<{ content: string; range: vscode.Range }[]> {
+    const text = doc.getText();
+    const result: { content: string; range: vscode.Range }[] = [];
+    const seen = new Set<string>();
+    const { includeLiteralExpression } = normalizeOptions(options);
+
+    if (!includeLiteralExpression) return result;
+
+    const pushRange = (start: number, end: number) => {
+        if (start >= end) return;
+        const key = `${start}:${end}`;
+        if (seen.has(key)) return;
+        seen.add(key);
+        const range = new vscode.Range(doc.positionAt(start), doc.positionAt(end));
+        result.push({ content: doc.getText(range), range });
+    };
+
+    let parser: any;
+    try {
+        parser = await getHtmlParser();
+    } catch {
+        return result;
+    }
+
+    let tree: any;
+    try {
+        tree = parser.parse(text);
+    } catch {
+        return result;
+    }
+
+    const walk = (node: any) => {
+        if (!node) return;
+
+        if (node.type === 'text') {
+            pushRange(node.startIndex, node.endIndex);
+        } else if (node.type === 'attribute') {
+            const valueNode =
+                typeof node.childForFieldName === 'function'
+                    ? node.childForFieldName('value')
+                    : null;
+            if (valueNode) {
+                pushRange(valueNode.startIndex, valueNode.endIndex);
+            } else {
+                for (const child of node.namedChildren ?? []) {
+                    if (child.type === 'quoted_attribute_value' || child.type === 'attribute_value') {
+                        pushRange(child.startIndex, child.endIndex);
+                    }
+                }
+            }
+        }
+
+        for (const child of node.children ?? []) {
+            walk(child);
+        }
+    };
+
+    walk(tree.rootNode);
+    return result;
+}
+
+export async function extractCssStrings(
+    doc: vscode.TextDocument,
+    options?: ExtractOptions
+): Promise<{ content: string; range: vscode.Range }[]> {
+    const text = doc.getText();
+    const result: { content: string; range: vscode.Range }[] = [];
+    const seen = new Set<string>();
+    const { includeLiteralExpression } = normalizeOptions(options);
+
+    if (!includeLiteralExpression) return result;
+
+    const pushRange = (start: number, end: number) => {
+        if (start >= end) return;
+        const key = `${start}:${end}`;
+        if (seen.has(key)) return;
+        seen.add(key);
+        const range = new vscode.Range(doc.positionAt(start), doc.positionAt(end));
+        result.push({ content: doc.getText(range), range });
+    };
+
+    let parser: any;
+    try {
+        parser = await getCssParser();
+    } catch {
+        return result;
+    }
+
+    let tree: any;
+    try {
+        tree = parser.parse(text);
+    } catch {
+        return result;
+    }
+
+    const shouldCaptureTypes = new Set(['string_value']);
+
+    const walk = (node: any) => {
+        if (!node) return;
+        if (shouldCaptureTypes.has(node.type)) {
+            pushRange(node.startIndex, node.endIndex);
+        }
+        for (const child of node.children ?? []) {
+            walk(child);
+        }
+    };
+
+    walk(tree.rootNode);
     return result;
 }
 
