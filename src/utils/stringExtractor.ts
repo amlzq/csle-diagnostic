@@ -9,6 +9,7 @@ let treeSitterInitPromise: Promise<void> | null = null;
 let dartParserPromise: Promise<any> | null = null;
 let htmlParserPromise: Promise<any> | null = null;
 let cssParserPromise: Promise<any> | null = null;
+let jsonParserPromise: Promise<any> | null = null;
 let phpParserPromise: Promise<any> | null = null;
 let pythonParserPromise: Promise<any> | null = null;
 
@@ -106,6 +107,22 @@ const getCssParser = async (): Promise<any> => {
         return parser;
     })();
     return cssParserPromise;
+};
+
+const getJsonParser = async (): Promise<any> => {
+    if (jsonParserPromise) return jsonParserPromise;
+    jsonParserPromise = (async () => {
+        const rootDir = getRootDir();
+        const jsonLangWasmPath = path.join(rootDir, 'node_modules', 'tree-sitter-json', 'tree-sitter-json.wasm');
+
+        await ensureTreeSitterInitialized();
+
+        const lang = await WebTreeSitter.Language.load(jsonLangWasmPath);
+        const parser = new WebTreeSitter.Parser();
+        parser.setLanguage(lang);
+        return parser;
+    })();
+    return jsonParserPromise;
 };
 
 const getPythonParser = async (): Promise<any> => {
@@ -406,6 +423,54 @@ export async function extractCssStrings(
             if (raw.startsWith('/*')) {
                 pushRange(start, end);
             }
+        }
+        for (const child of node.children ?? []) {
+            walk(child);
+        }
+    };
+
+    walk(tree.rootNode);
+    return result;
+}
+
+export async function extractJsonStrings(
+    doc: vscode.TextDocument,
+    options?: ExtractOptions
+): Promise<{ content: string; range: vscode.Range }[]> {
+    const text = doc.getText();
+    const result: { content: string; range: vscode.Range }[] = [];
+    const seen = new Set<string>();
+    const { includeLiteralExpression } = normalizeOptions(options);
+
+    if (!includeLiteralExpression) return result;
+
+    const pushRange = (start: number, end: number) => {
+        if (start >= end) return;
+        const key = `${start}:${end}`;
+        if (seen.has(key)) return;
+        seen.add(key);
+        const range = new vscode.Range(doc.positionAt(start), doc.positionAt(end));
+        result.push({ content: doc.getText(range), range });
+    };
+
+    let parser: any;
+    try {
+        parser = await getJsonParser();
+    } catch {
+        return result;
+    }
+
+    let tree: any;
+    try {
+        tree = parser.parse(text);
+    } catch {
+        return result;
+    }
+
+    const walk = (node: any) => {
+        if (!node) return;
+        if (node.type === 'string') {
+            pushRange(node.startIndex, node.endIndex);
         }
         for (const child of node.children ?? []) {
             walk(child);

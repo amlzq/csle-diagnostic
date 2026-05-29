@@ -178,6 +178,22 @@ suite('CsleActivation 扩展测试', function () {
         assert.strictEqual(doc.getText(), 's = "簡體測試"\n');
     });
 
+    test('应识别 JSON 字符串值并提供修复', async () => {
+        const doc = await vscode.workspace.openTextDocument({
+            language: 'json',
+            content: '{\n  "title": "简体测试",\n  "nested": { "k": "网络" }\n}\n',
+        });
+        await vscode.window.showTextDocument(doc);
+
+        const diagnostics = await waitForDiagnosticsCount(doc.uri, 2);
+        assert.strictEqual(diagnostics.length, 2, '应检测到两个诊断');
+
+        await applyPreferredFixes(doc, diagnostics);
+        const newText = doc.getText();
+        assert.ok(newText.includes('"簡體測試"'));
+        assert.ok(newText.includes('"網路"'));
+    });
+
     test('应识别 PHP 单引号字符串并提供修复', async () => {
         const doc = await vscode.workspace.openTextDocument({
             language: 'php',

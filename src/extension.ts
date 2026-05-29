@@ -5,7 +5,7 @@ import { refreshDiagnostics } from './diagnostics';
 import { CsleCodeActionProvider } from './quickfix/codeActionProvider';
 import { prewarmTreeSitterRuntime } from './utils/stringExtractor';
 
-const languages = ['dart', 'javascript', 'typescript', 'javascriptreact', 'typescriptreact', 'html', 'css', 'php', 'python'];
+const languages = ['dart', 'javascript', 'typescript', 'javascriptreact', 'typescriptreact', 'html', 'css', 'json', 'php', 'python'];
 
 export function activate(context: vscode.ExtensionContext) {
     const diagnosticCollection = vscode.languages.createDiagnosticCollection('cslediagnostic');

@@ -3,7 +3,7 @@ import { refreshDartDiagnostics } from './dart';
 import { refreshWebDiagnostics } from './js-ts-jsx-tsx';
 import { refreshPHPDiagnostics } from './php';
 import { refreshPythonDiagnostics } from './python';
-import { refreshCssDiagnostics, refreshHtmlDiagnostics } from './js-ts-jsx-tsx';
+import { refreshCssDiagnostics, refreshHtmlDiagnostics, refreshJsonDiagnostics } from './js-ts-jsx-tsx';
 
 export async function refreshDiagnostics(
     doc: vscode.TextDocument,
@@ -17,6 +17,8 @@ export async function refreshDiagnostics(
         await refreshHtmlDiagnostics(doc, collection);
     } else if (doc.languageId === 'css') {
         await refreshCssDiagnostics(doc, collection);
+    } else if (doc.languageId === 'json') {
+        await refreshJsonDiagnostics(doc, collection);
     } else if (doc.languageId === 'php') {
         await refreshPHPDiagnostics(doc, collection);
     } else if (doc.languageId === 'python') {
