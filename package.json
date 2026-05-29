@@ -84,7 +84,7 @@
           "title": "%cslediagnostic.checkDocComment.title%",
           "description": "%cslediagnostic.checkDocComment.desc%"
         },
-        "cslediagnostic.excludeMethods": {
+        "cslediagnostic.excludeNames": {
           "type": "array",
           "order": 5,
           "scope": "language-overridable",
@@ -92,7 +92,18 @@
             "type": "string"
           },
           "default": [],
-          "description": "%cslediagnostic.excludeMethods.desc%"
+          "description": "%cslediagnostic.excludeNames.desc%"
+        },
+        "cslediagnostic.excludeMethods": {
+          "type": "array",
+          "order": 6,
+          "scope": "language-overridable",
+          "items": {
+            "type": "string"
+          },
+          "default": [],
+          "description": "%cslediagnostic.excludeMethods.desc%",
+          "deprecationMessage": "Deprecated. Use cslediagnostic.excludeNames instead."
         }
       }
     },

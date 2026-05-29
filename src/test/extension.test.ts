@@ -225,8 +225,8 @@ suite('CsleActivation 扩展测试', function () {
         assert.ok(doc.getText().includes('\nEOT;\n'));
     });
 
-    test('excludeMethods 配置应生效', async () => {
-        await withConfig({ excludeMethods: ['t'] }, async () => {
+    test('excludeNames 配置应生效', async () => {
+        await withConfig({ excludeNames: ['t'] }, async () => {
             const doc = await vscode.workspace.openTextDocument({
                 language: 'typescript',
                 content: "t('简体测试');\n",
@@ -234,7 +234,7 @@ suite('CsleActivation 扩展测试', function () {
             await vscode.window.showTextDocument(doc);
 
             const diagnostics = await waitForDiagnosticsCount(doc.uri, 0);
-            assert.strictEqual(diagnostics.length, 0, 'excludeMethods 命中时不应产生诊断');
+            assert.strictEqual(diagnostics.length, 0, 'excludeNames 命中时不应产生诊断');
         });
     });
 
@@ -277,7 +277,7 @@ suite('CsleActivation 扩展测试', function () {
             {
                 checkGlyph: vscode.l10n.t('Simplified Chinese'),
                 convertGlyph: vscode.l10n.t('Chinese (Taiwan)'),
-                excludeMethods: [],
+                excludeNames: [],
             },
             async () => {
                 const doc = await vscode.workspace.openTextDocument({
@@ -318,8 +318,8 @@ suite('CsleActivation 扩展测试', function () {
         assert.ok(doc.getText().includes('"""簡體測試"""'));
     });
 
-    test('excludeMethods 应支持点号方法名', async () => {
-        await withConfig({ excludeMethods: ['i18n.t'] }, async () => {
+    test('excludeNames 应支持点号方法名', async () => {
+        await withConfig({ excludeNames: ['i18n.t'] }, async () => {
             const doc = await vscode.workspace.openTextDocument({
                 language: 'typescript',
                 content: "i18n.t('简体测试');\n",
@@ -331,10 +331,36 @@ suite('CsleActivation 扩展测试', function () {
         });
     });
 
+    test('excludeNames 应支持按 JSON key 排除 value', async () => {
+        await withConfig({ excludeNames: ['title'] }, async () => {
+            const doc = await vscode.workspace.openTextDocument({
+                language: 'json',
+                content: '{ "title": "简体测试" }\n',
+            });
+            await vscode.window.showTextDocument(doc);
+
+            const diagnostics = await waitForDiagnosticsCount(doc.uri, 0);
+            assert.strictEqual(diagnostics.length, 0);
+        });
+    });
+
+    test('excludeNames 应支持按 HTML tag 排除文本', async () => {
+        await withConfig({ excludeNames: ['div'] }, async () => {
+            const doc = await vscode.workspace.openTextDocument({
+                language: 'html',
+                content: '<div>简体测试</div>\n',
+            });
+            await vscode.window.showTextDocument(doc);
+
+            const diagnostics = await waitForDiagnosticsCount(doc.uri, 0);
+            assert.strictEqual(diagnostics.length, 0);
+        });
+    });
+
     test('配置变更后应触发已打开文档的重新诊断', async () => {
         const config = vscode.workspace.getConfiguration('cslediagnostic');
-        const prevExclude = config.get('excludeMethods');
-        await config.update('excludeMethods', [], vscode.ConfigurationTarget.Global);
+        const prevExclude = config.get('excludeNames');
+        await config.update('excludeNames', [], vscode.ConfigurationTarget.Global);
 
         const doc = await vscode.workspace.openTextDocument({
             language: 'typescript',
@@ -346,11 +372,11 @@ suite('CsleActivation 扩展测试', function () {
         assert.strictEqual(before.length, 1);
 
         try {
-            await config.update('excludeMethods', ['t'], vscode.ConfigurationTarget.Global);
+            await config.update('excludeNames', ['t'], vscode.ConfigurationTarget.Global);
             const after = await waitForDiagnosticsCount(doc.uri, 0, 20000);
             assert.strictEqual(after.length, 0);
         } finally {
-            await config.update('excludeMethods', prevExclude as any, vscode.ConfigurationTarget.Global);
+            await config.update('excludeNames', prevExclude as any, vscode.ConfigurationTarget.Global);
         }
     });
 

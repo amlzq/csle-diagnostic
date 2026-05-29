@@ -1,12 +1,12 @@
 import * as OpenCC from 'opencc-js';
 import * as vscode from 'vscode';
 import { getUserConfig } from '../utils/config';
-import { shouldExclude } from '../utils/excludeMethods';
+import { shouldExclude } from '../utils/excludeNames';
 import { extractCssStrings, extractHtmlStrings, extractJsonStrings, extractWebStrings } from '../utils/stringExtractor';
 import { toLabel, toLocale } from '../utils/utils';
 
 export function refreshWebDiagnostics(doc: vscode.TextDocument, collection: vscode.DiagnosticCollection) {
-    const { checkGlyph, convertGlyph, excludeMethods, checkLiteralExpression, checkDocComment } = getUserConfig(doc);
+    const { checkGlyph, convertGlyph, excludeNames, checkLiteralExpression, checkDocComment } = getUserConfig(doc);
     const from: OpenCC.Locale = toLocale(checkGlyph);
     const to: OpenCC.Locale = toLocale(convertGlyph);
     const converter = OpenCC.Converter({ from: from, to: to });
@@ -21,7 +21,7 @@ export function refreshWebDiagnostics(doc: vscode.TextDocument, collection: vsco
 
     for (const { content, range } of matches) {
         if (!/[一-龥]/.test(content)) continue;
-        if (shouldExclude(doc, range, excludeMethods)) continue;
+        if (shouldExclude(doc, range, excludeNames)) continue;
         const converted = converter(content);
         if (converted !== content) {
             const diagnostic = new vscode.Diagnostic(
@@ -38,7 +38,7 @@ export function refreshWebDiagnostics(doc: vscode.TextDocument, collection: vsco
 
 export async function refreshHtmlDiagnostics(doc: vscode.TextDocument, collection: vscode.DiagnosticCollection) {
     const docVersion = doc.version;
-    const { checkGlyph, convertGlyph, excludeMethods, checkLiteralExpression, checkDocComment } = getUserConfig(doc);
+    const { checkGlyph, convertGlyph, excludeNames, checkLiteralExpression, checkDocComment } = getUserConfig(doc);
     const from: OpenCC.Locale = toLocale(checkGlyph);
     const to: OpenCC.Locale = toLocale(convertGlyph);
     const converter = OpenCC.Converter({ from: from, to: to });
@@ -53,7 +53,7 @@ export async function refreshHtmlDiagnostics(doc: vscode.TextDocument, collectio
 
     for (const { content, range } of matches) {
         if (!/[一-龥]/.test(content)) continue;
-        if (shouldExclude(doc, range, excludeMethods)) continue;
+        if (shouldExclude(doc, range, excludeNames)) continue;
         const converted = converter(content);
         if (converted !== content) {
             const diagnostic = new vscode.Diagnostic(
@@ -73,7 +73,7 @@ export async function refreshHtmlDiagnostics(doc: vscode.TextDocument, collectio
 
 export async function refreshCssDiagnostics(doc: vscode.TextDocument, collection: vscode.DiagnosticCollection) {
     const docVersion = doc.version;
-    const { checkGlyph, convertGlyph, excludeMethods, checkLiteralExpression, checkDocComment } = getUserConfig(doc);
+    const { checkGlyph, convertGlyph, excludeNames, checkLiteralExpression, checkDocComment } = getUserConfig(doc);
     const from: OpenCC.Locale = toLocale(checkGlyph);
     const to: OpenCC.Locale = toLocale(convertGlyph);
     const converter = OpenCC.Converter({ from: from, to: to });
@@ -88,7 +88,7 @@ export async function refreshCssDiagnostics(doc: vscode.TextDocument, collection
 
     for (const { content, range } of matches) {
         if (!/[一-龥]/.test(content)) continue;
-        if (shouldExclude(doc, range, excludeMethods)) continue;
+        if (shouldExclude(doc, range, excludeNames)) continue;
         const converted = converter(content);
         if (converted !== content) {
             const diagnostic = new vscode.Diagnostic(
@@ -108,7 +108,7 @@ export async function refreshCssDiagnostics(doc: vscode.TextDocument, collection
 
 export async function refreshJsonDiagnostics(doc: vscode.TextDocument, collection: vscode.DiagnosticCollection) {
     const docVersion = doc.version;
-    const { checkGlyph, convertGlyph, excludeMethods, checkLiteralExpression } = getUserConfig(doc);
+    const { checkGlyph, convertGlyph, excludeNames, checkLiteralExpression } = getUserConfig(doc);
     const from: OpenCC.Locale = toLocale(checkGlyph);
     const to: OpenCC.Locale = toLocale(convertGlyph);
     const converter = OpenCC.Converter({ from: from, to: to });
@@ -123,7 +123,7 @@ export async function refreshJsonDiagnostics(doc: vscode.TextDocument, collectio
 
     for (const { content, range } of matches) {
         if (!/[一-龥]/.test(content)) continue;
-        if (shouldExclude(doc, range, excludeMethods)) continue;
+        if (shouldExclude(doc, range, excludeNames)) continue;
         const converted = converter(content);
         if (converted !== content) {
             const diagnostic = new vscode.Diagnostic(
