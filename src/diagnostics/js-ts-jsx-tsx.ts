@@ -38,7 +38,7 @@ export function refreshWebDiagnostics(doc: vscode.TextDocument, collection: vsco
 
 export async function refreshHtmlDiagnostics(doc: vscode.TextDocument, collection: vscode.DiagnosticCollection) {
     const docVersion = doc.version;
-    const { checkGlyph, convertGlyph, excludeMethods, checkLiteralExpression } = getUserConfig(doc);
+    const { checkGlyph, convertGlyph, excludeMethods, checkLiteralExpression, checkDocComment } = getUserConfig(doc);
     const from: OpenCC.Locale = toLocale(checkGlyph);
     const to: OpenCC.Locale = toLocale(convertGlyph);
     const converter = OpenCC.Converter({ from: from, to: to });
@@ -46,6 +46,7 @@ export async function refreshHtmlDiagnostics(doc: vscode.TextDocument, collectio
     const diagnostics: vscode.Diagnostic[] = [];
     const matches = await extractHtmlStrings(doc, {
         includeLiteralExpression: checkLiteralExpression,
+        includeDocComment: checkDocComment,
     });
 
     const message = vscode.l10n.t('Contains {0} (expected {1})', toLabel(from), toLabel(to));
@@ -72,7 +73,7 @@ export async function refreshHtmlDiagnostics(doc: vscode.TextDocument, collectio
 
 export async function refreshCssDiagnostics(doc: vscode.TextDocument, collection: vscode.DiagnosticCollection) {
     const docVersion = doc.version;
-    const { checkGlyph, convertGlyph, excludeMethods, checkLiteralExpression } = getUserConfig(doc);
+    const { checkGlyph, convertGlyph, excludeMethods, checkLiteralExpression, checkDocComment } = getUserConfig(doc);
     const from: OpenCC.Locale = toLocale(checkGlyph);
     const to: OpenCC.Locale = toLocale(convertGlyph);
     const converter = OpenCC.Converter({ from: from, to: to });
@@ -80,6 +81,7 @@ export async function refreshCssDiagnostics(doc: vscode.TextDocument, collection
     const diagnostics: vscode.Diagnostic[] = [];
     const matches = await extractCssStrings(doc, {
         includeLiteralExpression: checkLiteralExpression,
+        includeDocComment: checkDocComment,
     });
 
     const message = vscode.l10n.t('Contains {0} (expected {1})', toLabel(from), toLabel(to));

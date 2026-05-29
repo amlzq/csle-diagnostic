@@ -293,9 +293,9 @@ export async function extractHtmlStrings(
     const text = doc.getText();
     const result: { content: string; range: vscode.Range }[] = [];
     const seen = new Set<string>();
-    const { includeLiteralExpression } = normalizeOptions(options);
+    const { includeLiteralExpression, includeDocComment } = normalizeOptions(options);
 
-    if (!includeLiteralExpression) return result;
+    if (!includeLiteralExpression && !includeDocComment) return result;
 
     const pushRange = (start: number, end: number) => {
         if (start >= end) return;
@@ -323,9 +323,9 @@ export async function extractHtmlStrings(
     const walk = (node: any) => {
         if (!node) return;
 
-        if (node.type === 'text') {
+        if (includeLiteralExpression && node.type === 'text') {
             pushRange(node.startIndex, node.endIndex);
-        } else if (node.type === 'attribute') {
+        } else if (includeLiteralExpression && node.type === 'attribute') {
             const valueNode =
                 typeof node.childForFieldName === 'function'
                     ? node.childForFieldName('value')
@@ -338,6 +338,14 @@ export async function extractHtmlStrings(
                         pushRange(child.startIndex, child.endIndex);
                     }
                 }
+            }
+        } else if (includeDocComment && node.type === 'comment') {
+            const start = node.startIndex;
+            const end = node.endIndex;
+            const range = new vscode.Range(doc.positionAt(start), doc.positionAt(end));
+            const raw = doc.getText(range);
+            if (raw.startsWith('<!--')) {
+                pushRange(start, end);
             }
         }
 
@@ -357,9 +365,9 @@ export async function extractCssStrings(
     const text = doc.getText();
     const result: { content: string; range: vscode.Range }[] = [];
     const seen = new Set<string>();
-    const { includeLiteralExpression } = normalizeOptions(options);
+    const { includeLiteralExpression, includeDocComment } = normalizeOptions(options);
 
-    if (!includeLiteralExpression) return result;
+    if (!includeLiteralExpression && !includeDocComment) return result;
 
     const pushRange = (start: number, end: number) => {
         if (start >= end) return;
@@ -388,8 +396,16 @@ export async function extractCssStrings(
 
     const walk = (node: any) => {
         if (!node) return;
-        if (shouldCaptureTypes.has(node.type)) {
+        if (includeLiteralExpression && shouldCaptureTypes.has(node.type)) {
             pushRange(node.startIndex, node.endIndex);
+        } else if (includeDocComment && node.type === 'comment') {
+            const start = node.startIndex;
+            const end = node.endIndex;
+            const range = new vscode.Range(doc.positionAt(start), doc.positionAt(end));
+            const raw = doc.getText(range);
+            if (raw.startsWith('/*')) {
+                pushRange(start, end);
+            }
         }
         for (const child of node.children ?? []) {
             walk(child);
