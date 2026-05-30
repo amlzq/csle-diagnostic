@@ -93,17 +93,6 @@
           },
           "default": [],
           "description": "%cslediagnostic.excludeNames.desc%"
-        },
-        "cslediagnostic.excludeMethods": {
-          "type": "array",
-          "order": 6,
-          "scope": "language-overridable",
-          "items": {
-            "type": "string"
-          },
-          "default": [],
-          "description": "%cslediagnostic.excludeMethods.desc%",
-          "deprecationMessage": "Deprecated. Use cslediagnostic.excludeNames instead."
         }
       }
     },
