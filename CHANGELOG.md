@@ -1,3 +1,10 @@
+# 0.1.0
+
+- Support checking and converting Documentation Comment.
+- Support checking and converting HTML tags in HTML files.
+- Support checking and converting CSS tags in CSS files.
+- Support checking and converting JSON values in JSON files.
+
 # 0.0.4
 
 - Improve parser initialization stability for Dart / PHP / Python (tree-sitter runtime prewarm + error recovery).

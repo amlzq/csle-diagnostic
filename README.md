@@ -10,6 +10,8 @@ In the extension settings view, you can modify the Chinese characters glyphs you
 
 - Dart
 - JavaScript and TypeScript
+- HTML / CSS
+- JSON
 - PHP
 - Python
 

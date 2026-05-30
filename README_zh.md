@@ -10,6 +10,8 @@
 
 - Dart
 - JavaScript and TypeScript
+- HTML / CSS
+- JSON
 - PHP
 - Python
 
