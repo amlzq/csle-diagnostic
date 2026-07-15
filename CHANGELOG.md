@@ -1,3 +1,9 @@
+# 0.1.1
+
+- Internal: split integration tests by language and add a unit test suite.
+- Internal: remove stale test artifact and clean `out` before compile/publish to avoid duplicate test runs.
+- Internal: downgrade AST parse error log to debug level to reduce noise.
+
 # 0.1.0
 
 - Support checking and converting Documentation Comment.
