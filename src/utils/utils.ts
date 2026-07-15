@@ -1,8 +1,8 @@
-import * as OpenCC from 'opencc-js';
+import { Locale } from './opencc';
 import * as vscode from 'vscode';
 
-export function toLocale(glyph: string): OpenCC.Locale {
-    let locale: OpenCC.Locale;
+export function toLocale(glyph: string): Locale {
+    let locale: Locale;
     switch (glyph) {
         case vscode.l10n.t('Simplified Chinese'):
             locale = 'cn';
@@ -23,7 +23,7 @@ export function toLocale(glyph: string): OpenCC.Locale {
     return locale;
 }
 
-export function toLabel(locale: OpenCC.Locale): string {
+export function toLabel(locale: Locale): string {
     let label: string;
     switch (locale) {
         case 'cn':

@@ -1,6 +1,6 @@
-import * as OpenCC from 'opencc-js';
 import * as vscode from 'vscode';
 import { getUserConfig } from '../utils/config';
+import { createConverter } from '../utils/opencc';
 import { toLocale } from '../utils/utils';
 
 export class CsleCodeActionProvider implements vscode.CodeActionProvider {
@@ -13,9 +13,9 @@ export class CsleCodeActionProvider implements vscode.CodeActionProvider {
         const actions: vscode.CodeAction[] = [];
 
         const { checkGlyph, convertGlyph } = getUserConfig(document);
-        const from: OpenCC.Locale = toLocale(checkGlyph);
-        const to: OpenCC.Locale = toLocale(convertGlyph);
-        const converter = OpenCC.Converter({ from: from, to: to });
+        const from = toLocale(checkGlyph);
+        const to = toLocale(convertGlyph);
+        const converter = createConverter(from, to);
 
         for (const diagnostic of context.diagnostics) {
             if (diagnostic.code !== 'csle-convert') continue;

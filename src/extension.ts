@@ -4,10 +4,13 @@ import * as vscode from 'vscode';
 import { refreshDiagnostics } from './diagnostics';
 import { CsleCodeActionProvider } from './quickfix/codeActionProvider';
 import { prewarmTreeSitterRuntime } from './utils/stringExtractor';
+import { ensureOpenCC } from './utils/opencc';
 
 const languages = ['dart', 'javascript', 'typescript', 'javascriptreact', 'typescriptreact', 'html', 'css', 'json', 'php', 'python'];
 
-export function activate(context: vscode.ExtensionContext) {
+export async function activate(context: vscode.ExtensionContext) {
+    await ensureOpenCC();
+
     const diagnosticCollection = vscode.languages.createDiagnosticCollection('cslediagnostic');
     context.subscriptions.push(diagnosticCollection);
 

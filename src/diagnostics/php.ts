@@ -1,16 +1,16 @@
-import * as OpenCC from 'opencc-js';
 import * as vscode from 'vscode';
 import { getUserConfig } from '../utils/config';
 import { shouldExclude } from '../utils/excludeNames';
 import { extractPHPStrings } from '../utils/stringExtractor';
+import { createConverter } from '../utils/opencc';
 import { toLabel, toLocale } from '../utils/utils';
 
 export async function refreshPHPDiagnostics(doc: vscode.TextDocument, collection: vscode.DiagnosticCollection) {
     const docVersion = doc.version;
     const { checkGlyph, convertGlyph, excludeNames, checkLiteralExpression, checkDocComment } = getUserConfig(doc);
-    const from: OpenCC.Locale = toLocale(checkGlyph);
-    const to: OpenCC.Locale = toLocale(convertGlyph);
-    const converter = OpenCC.Converter({ from: from, to: to });
+    const from = toLocale(checkGlyph);
+    const to = toLocale(convertGlyph);
+    const converter = createConverter(from, to);
 
     const diagnostics: vscode.Diagnostic[] = [];
     const matches = await extractPHPStrings(doc, {
