@@ -206,7 +206,8 @@
     "watch": "tsc -watch -p ./",
     "pretest": "npm run compile && npm run lint",
     "lint": "eslint src",
-    "test": "vscode-test"
+    "test": "vscode-test",
+    "test:unit": "npm run compile && mocha"
   },
   "devDependencies": {
     "@types/babel__traverse": "^7.28.0",
@@ -218,6 +219,7 @@
     "@vscode/test-cli": "^0.0.10",
     "@vscode/test-electron": "^2.5.2",
     "eslint": "^9.25.1",
+    "mocha": "^10.8.2",
     "typescript": "^5.8.3"
   },
   "dependencies": {
