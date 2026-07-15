@@ -201,10 +201,10 @@
     ]
   },
   "scripts": {
-    "vscode:prepublish": "npm run compile",
+    "vscode:prepublish": "rm -rf out && npm run compile",
     "compile": "tsc -p ./",
     "watch": "tsc -watch -p ./",
-    "pretest": "npm run compile && npm run lint",
+    "pretest": "rm -rf out && npm run compile && npm run lint",
     "lint": "eslint src",
     "test": "vscode-test",
     "test:unit": "npm run compile && mocha"

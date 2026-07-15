@@ -245,7 +245,7 @@ export function extractWebStrings(
             errorRecovery: true,
         }) as unknown as t.File;
     } catch (e) {
-        console.warn('AST parse error:', e);
+        console.debug('AST parse failed (skipped):', e instanceof Error ? e.message : String(e));
         return result;
     }
 
