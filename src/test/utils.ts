@@ -16,7 +16,7 @@ export async function waitForDiagnostics(
     const start = Date.now();
     while (Date.now() - start < timeoutMs) {
         const diagnostics = getCsleDiagnostics(uri);
-        if (diagnostics.length > 0) return diagnostics;
+        if (diagnostics.length > 0) {return diagnostics;}
         await new Promise(resolve => setTimeout(resolve, 100));
     }
     return getCsleDiagnostics(uri);
@@ -34,7 +34,7 @@ export async function waitForDiagnosticsCount(
             if (expectedCount === 0) {
                 await delay(300);
                 const after = getCsleDiagnostics(uri);
-                if (after.length === 0) return after;
+                if (after.length === 0) {return after;}
             } else {
                 return diagnostics;
             }

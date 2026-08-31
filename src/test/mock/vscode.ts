@@ -46,7 +46,7 @@ export class Diagnostic {
 
 export const l10n = {
     t(template: string, ...args: any[]): string {
-        if (args.length === 0) return template;
+        if (args.length === 0) {return template;}
         return template.replace(/\{(\d+)\}/g, (_, idx) => String(args[Number(idx)] ?? ''));
     },
 };
@@ -90,7 +90,7 @@ export function createTextDocument(text: string, languageId = 'plaintext'): any 
     };
 
     const getText = (range?: Range): string => {
-        if (!range) return text;
+        if (!range) {return text;}
         return text.slice(offsetAt(range.start), offsetAt(range.end));
     };
 

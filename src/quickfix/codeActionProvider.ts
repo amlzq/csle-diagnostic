@@ -18,11 +18,11 @@ export class CsleCodeActionProvider implements vscode.CodeActionProvider {
         const converter = createConverter(from, to);
 
         for (const diagnostic of context.diagnostics) {
-            if (diagnostic.code !== 'csle-convert') continue;
+            if (diagnostic.code !== 'csle-convert') {continue;}
 
             const original = document.getText(diagnostic.range);
             const fixed = this.convertText(original, converter);
-            if (!fixed) continue;
+            if (!fixed) {continue;}
 
             const action = new vscode.CodeAction(
                 vscode.l10n.t('Convert to {0}', convertGlyph),

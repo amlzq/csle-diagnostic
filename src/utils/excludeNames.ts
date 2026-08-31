@@ -14,7 +14,7 @@ const getLastSegment = (name: string) => {
 
 const stripWrappingQuotes = (text: string) => {
     const trimmed = text.trim();
-    if (trimmed.length < 2) return trimmed;
+    if (trimmed.length < 2) {return trimmed;}
 
     const triples = ['"""', "'''"];
     for (const q of triples) {
@@ -35,19 +35,19 @@ const matchCandidateFromBeforeValue = (before: string): Candidate | null => {
     const s = before.slice(Math.max(0, before.length - 200));
 
     const callMatch = s.match(/([\w$.]+)\s*\($/);
-    if (callMatch) return { kind: 'call', name: callMatch[1] };
+    if (callMatch) {return { kind: 'call', name: callMatch[1] };}
 
     const phpArrayMatch = s.match(/(["'])([^"']+)\1\s*=>\s*$/);
-    if (phpArrayMatch) return { kind: 'key', name: phpArrayMatch[2] };
+    if (phpArrayMatch) {return { kind: 'key', name: phpArrayMatch[2] };}
 
     const quotedKeyMatch = s.match(/(["'])([^"']+)\1\s*:\s*$/);
-    if (quotedKeyMatch) return { kind: 'key', name: quotedKeyMatch[2] };
+    if (quotedKeyMatch) {return { kind: 'key', name: quotedKeyMatch[2] };}
 
     const colonKeyMatch = s.match(/([\w$.-]+)\s*:\s*$/);
-    if (colonKeyMatch) return { kind: 'key', name: colonKeyMatch[1] };
+    if (colonKeyMatch) {return { kind: 'key', name: colonKeyMatch[1] };}
 
     const equalMatch = s.match(/([\w$.-]+)\s*=\s*$/);
-    if (equalMatch) return { kind: 'member', name: equalMatch[1] };
+    if (equalMatch) {return { kind: 'member', name: equalMatch[1] };}
 
     return null;
 };
@@ -62,7 +62,7 @@ const findEnclosingTagName = (doc: vscode.TextDocument, startOffset: number): st
     let idx = beforeText.length - 1;
     while (idx >= 0) {
         const lt = beforeText.lastIndexOf('<', idx);
-        if (lt < 0) return null;
+        if (lt < 0) {return null;}
 
         const next = beforeText[lt + 1];
         if (next === '!' || next === '?') {
@@ -102,7 +102,7 @@ export function shouldExclude(
     range: vscode.Range,
     excludeNames: string[]
 ): boolean {
-    if (!excludeNames || excludeNames.length === 0) return false;
+    if (!excludeNames || excludeNames.length === 0) {return false;}
     const excluded = new Set(excludeNames);
 
     const startLine = doc.lineAt(range.start.line).text;
@@ -114,24 +114,24 @@ export function shouldExclude(
     const candidates: Candidate[] = [];
 
     const fromBefore = matchCandidateFromBeforeValue(before);
-    if (fromBefore) candidates.push(fromBefore);
+    if (fromBefore) {candidates.push(fromBefore);}
 
     if (/^\s*(?::|=>)\b/.test(after)) {
         const raw = doc.getText(range);
         const key = stripWrappingQuotes(raw);
-        if (key) candidates.push({ kind: 'selfKey', name: key });
+        if (key) {candidates.push({ kind: 'selfKey', name: key });}
     }
 
     const startOffset = doc.offsetAt(range.start);
     const tagName = findEnclosingTagName(doc, startOffset);
-    if (tagName) candidates.push({ kind: 'tag', name: tagName });
+    if (tagName) {candidates.push({ kind: 'tag', name: tagName });}
 
     for (const c of candidates) {
-        if (excluded.has(c.name)) return true;
-        if (c.kind === 'tag' && excluded.has(c.name.toLowerCase())) return true;
+        if (excluded.has(c.name)) {return true;}
+        if (c.kind === 'tag' && excluded.has(c.name.toLowerCase())) {return true;}
         if (c.kind !== 'call') {
             const last = getLastSegment(c.name);
-            if (last !== c.name && excluded.has(last)) return true;
+            if (last !== c.name && excluded.has(last)) {return true;}
         }
     }
     return false;

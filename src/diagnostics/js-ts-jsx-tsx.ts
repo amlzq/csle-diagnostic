@@ -20,8 +20,8 @@ export function refreshWebDiagnostics(doc: vscode.TextDocument, collection: vsco
     const message = vscode.l10n.t('Contains {0} (expected {1})', toLabel(from), toLabel(to));
 
     for (const { content, range } of matches) {
-        if (!/[一-龥]/.test(content)) continue;
-        if (shouldExclude(doc, range, excludeNames)) continue;
+        if (!/[一-龥]/.test(content)) {continue;}
+        if (shouldExclude(doc, range, excludeNames)) {continue;}
         const converted = converter(content);
         if (converted !== content) {
             const diagnostic = new vscode.Diagnostic(
@@ -52,8 +52,8 @@ export async function refreshHtmlDiagnostics(doc: vscode.TextDocument, collectio
     const message = vscode.l10n.t('Contains {0} (expected {1})', toLabel(from), toLabel(to));
 
     for (const { content, range } of matches) {
-        if (!/[一-龥]/.test(content)) continue;
-        if (shouldExclude(doc, range, excludeNames)) continue;
+        if (!/[一-龥]/.test(content)) {continue;}
+        if (shouldExclude(doc, range, excludeNames)) {continue;}
         const converted = converter(content);
         if (converted !== content) {
             const diagnostic = new vscode.Diagnostic(
@@ -87,8 +87,8 @@ export async function refreshCssDiagnostics(doc: vscode.TextDocument, collection
     const message = vscode.l10n.t('Contains {0} (expected {1})', toLabel(from), toLabel(to));
 
     for (const { content, range } of matches) {
-        if (!/[一-龥]/.test(content)) continue;
-        if (shouldExclude(doc, range, excludeNames)) continue;
+        if (!/[一-龥]/.test(content)) {continue;}
+        if (shouldExclude(doc, range, excludeNames)) {continue;}
         const converted = converter(content);
         if (converted !== content) {
             const diagnostic = new vscode.Diagnostic(
@@ -122,8 +122,8 @@ export async function refreshJsonDiagnostics(doc: vscode.TextDocument, collectio
     const message = vscode.l10n.t('Contains {0} (expected {1})', toLabel(from), toLabel(to));
 
     for (const { content, range } of matches) {
-        if (!/[一-龥]/.test(content)) continue;
-        if (shouldExclude(doc, range, excludeNames)) continue;
+        if (!/[一-龥]/.test(content)) {continue;}
+        if (shouldExclude(doc, range, excludeNames)) {continue;}
         const converted = converter(content);
         if (converted !== content) {
             const diagnostic = new vscode.Diagnostic(

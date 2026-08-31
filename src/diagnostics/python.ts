@@ -21,8 +21,8 @@ export async function refreshPythonDiagnostics(doc: vscode.TextDocument, collect
     const message = vscode.l10n.t('Contains {0} (expected {1})', toLabel(from), toLabel(to));
 
     for (const { content, range } of matches) {
-        if (!/[一-龥]/.test(content)) continue;
-        if (shouldExclude(doc, range, excludeNames)) continue;
+        if (!/[一-龥]/.test(content)) {continue;}
+        if (shouldExclude(doc, range, excludeNames)) {continue;}
         const converted = converter(content);
         if (converted !== content) {
             const diagnostic = new vscode.Diagnostic(

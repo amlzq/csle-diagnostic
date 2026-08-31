@@ -17,7 +17,7 @@ export async function activate(context: vscode.ExtensionContext) {
     const perDocState = new Map<string, { running: boolean; requestedVersion: number; doc: vscode.TextDocument }>();
 
     function requestDiagnostics(doc: vscode.TextDocument) {
-        if (!languages.includes(doc.languageId)) return;
+        if (!languages.includes(doc.languageId)) {return;}
 
         const key = doc.uri.toString();
         const existing = perDocState.get(key);
@@ -26,7 +26,7 @@ export async function activate(context: vscode.ExtensionContext) {
         state.doc = doc;
         perDocState.set(key, state);
 
-        if (state.running) return;
+        if (state.running) {return;}
 
         void (async () => {
             state.running = true;
@@ -35,7 +35,7 @@ export async function activate(context: vscode.ExtensionContext) {
                     const version = state.requestedVersion;
                     const currentDoc = state.doc;
                     await refreshDiagnostics(currentDoc, diagnosticCollection);
-                    if (state.requestedVersion === version) break;
+                    if (state.requestedVersion === version) {break;}
                 }
             } finally {
                 state.running = false;
