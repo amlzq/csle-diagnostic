@@ -226,7 +226,7 @@
     "@babel/parser": "^7.28.6",
     "@babel/traverse": "^7.28.6",
     "@babel/types": "^7.28.6",
-    "opencc-js": "^1.4.1",
+    "opencc-js": "^1.4.2",
     "tree-sitter-css": "^0.23.2",
     "tree-sitter-dart": "^1.0.0",
     "tree-sitter-html": "^0.23.2",
