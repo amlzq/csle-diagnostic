@@ -5,7 +5,7 @@
   "cslediagnostic.checkLiteralExpression.title": "字面量表達式",
   "cslediagnostic.checkDocComment.title": "文件註釋",
   "cslediagnostic.checkLiteralExpression.desc": "字面量表達式",
-  "cslediagnostic.checkDocComment.desc": "文件註釋",
+  "cslediagnostic.checkDocComment.desc": "文件註釋(僅支援 Dart、JavaScript/TypeScript、PHP、Python;HTML、CSS、JSON 沒有文件註釋語法,不支援)",
   "cslediagnostic.excludeNames.desc": "排除檢查嘅名稱（key/field/tag/函數名/方法鏈等，例如 title、div、print、console.log、i18n.t）",
   "cslediagnostic.excludeMethods.desc": "排除檢查嘅名稱（key/field/tag/函數名/方法鏈等，例如 title、div、print、console.log、i18n.t）",
   "cslediagnostic.simplified": "簡體中文",

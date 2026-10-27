@@ -5,7 +5,7 @@
   "cslediagnostic.checkLiteralExpression.title": "Literal expressions",
   "cslediagnostic.checkDocComment.title": "Documentation comments",
   "cslediagnostic.checkLiteralExpression.desc": "Literal expressions",
-  "cslediagnostic.checkDocComment.desc": "Documentation comments",
+  "cslediagnostic.checkDocComment.desc": "Documentation comments (Dart, JavaScript/TypeScript, PHP, Python only; not supported for HTML, CSS, JSON)",
   "cslediagnostic.excludeNames.desc": "Exclude names (keys/fields/tags/function names/method chains) from checking (such as title, div, print, console.log, i18n.t, etc.)",
   "cslediagnostic.excludeMethods.desc": "Exclude names (keys/fields/tags/function names/method chains) from checking (such as title, div, print, console.log, i18n.t, etc.)",
   "cslediagnostic.simplified": "Simplified Chinese",
