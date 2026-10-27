@@ -2,43 +2,94 @@ import * as vscode from 'vscode';
 import { getUserConfig } from '../utils/config';
 import { toLocale } from '../utils/utils';
 import { Finding } from '../scan/scanDocument';
-import { scanScope } from '../scan/scanWorkspace';
+import { ScanSummary, scanScope } from '../scan/scanWorkspace';
 import { registerAcceptCommands } from './acceptCommands';
 import { RESULTS_VIEW_ID, ResultNode, ResultsStore, ResultsTreeProvider } from '../view/resultsTreeProvider';
 
-async function runScan(store: ResultsStore, scope: vscode.Uri[]) {
-    const { checkGlyph, convertGlyph } = getUserConfig(scope[0]);
-    if (toLocale(checkGlyph) === toLocale(convertGlyph)) {
-        void vscode.window.showInformationMessage(
-            vscode.l10n.t('Check glyph and convert glyph are the same; nothing to convert.')
-        );
-        return;
+export type ScanOutcome =
+    | { status: 'skipped' }
+    | { status: 'same-glyph' }
+    | { status: 'cancelled' }
+    | { status: 'done'; summary: ScanSummary };
+
+export interface RunScanOptions {
+    /** 静默模式（自动诊断）：状态栏进度、不弹提示、不聚焦视图，结果由调用方处理 */
+    silent?: boolean;
+    /** 已收集好的文件列表，避免重复查找 */
+    files?: vscode.Uri[];
+}
+
+/** 当前正在运行的扫描；同一时间只允许一个，避免互相覆盖 ResultsStore */
+let current: { cts: vscode.CancellationTokenSource; silent: boolean } | undefined;
+
+/** 取消正在运行的静默（自动）扫描，例如用户关闭了自动诊断开关 */
+export function cancelSilentScan() {
+    if (current?.silent) {
+        current.cts.cancel();
+    }
+}
+
+export async function runScan(store: ResultsStore, scope: vscode.Uri[], options: RunScanOptions = {}): Promise<ScanOutcome> {
+    const silent = options.silent === true;
+
+    if (current) {
+        // 自动扫描让位于任何正在运行的扫描；手动扫描只会取消自动扫描
+        if (silent || !current.silent) {return { status: 'skipped' };}
+        current.cts.cancel();
     }
 
-    const summary = await vscode.window.withProgress(
-        {
-            location: vscode.ProgressLocation.Notification,
-            title: vscode.l10n.t('Chinese Expression Diagnostic: scanning…'),
-            cancellable: true,
-        },
-        (progress, token) => scanScope(scope, progress, token)
-    );
+    const { checkGlyph, convertGlyph } = getUserConfig(scope[0]);
+    if (toLocale(checkGlyph) === toLocale(convertGlyph)) {
+        if (!silent) {
+            void vscode.window.showInformationMessage(
+                vscode.l10n.t('Check glyph and convert glyph are the same; nothing to convert.')
+            );
+        }
+        return { status: 'same-glyph' };
+    }
+
+    const cts = new vscode.CancellationTokenSource();
+    const mine = { cts, silent };
+    current = mine;
+    let summary: ScanSummary;
+    try {
+        summary = await vscode.window.withProgress(
+            {
+                location: silent ? vscode.ProgressLocation.Window : vscode.ProgressLocation.Notification,
+                title: vscode.l10n.t('Chinese Expression Diagnostic: scanning…'),
+                cancellable: !silent,
+            },
+            (progress, token) => {
+                token.onCancellationRequested(() => cts.cancel());
+                return scanScope(scope, progress, cts.token, { files: options.files, yieldBetweenFiles: silent });
+            }
+        );
+    } finally {
+        if (current === mine) {current = undefined;}
+        cts.dispose();
+    }
 
     if (summary.cancelled) {
-        void vscode.window.showInformationMessage(vscode.l10n.t('Scan cancelled.'));
-        return;
+        if (!silent) {
+            void vscode.window.showInformationMessage(vscode.l10n.t('Scan cancelled.'));
+        }
+        return { status: 'cancelled' };
     }
 
     store.set(scope, summary);
+    if (silent) {
+        return { status: 'done', summary };
+    }
     if (summary.files.length === 0) {
         void vscode.window.showInformationMessage(
             summary.scanned === 0
                 ? vscode.l10n.t('No supported files found.')
                 : vscode.l10n.t('No content to convert in {0} files.', summary.scanned)
         );
-        return;
+    } else {
+        await vscode.commands.executeCommand(`${RESULTS_VIEW_ID}.focus`);
     }
-    await vscode.commands.executeCommand(`${RESULTS_VIEW_ID}.focus`);
+    return { status: 'done', summary };
 }
 
 export function registerScanCommands(context: vscode.ExtensionContext) {

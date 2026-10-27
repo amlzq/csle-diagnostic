@@ -78,12 +78,20 @@ async function openForScan(uri: vscode.Uri): Promise<vscode.TextDocument> {
     }
 }
 
+export interface ScanOptions {
+    /** 已收集好的文件列表（来自 collectFiles），传入则不再重复查找文件 */
+    files?: vscode.Uri[];
+    /** 每处理完一个文件就让出事件循环，降低后台扫描对交互的影响 */
+    yieldBetweenFiles?: boolean;
+}
+
 export async function scanScope(
     scope: vscode.Uri[],
     progress?: vscode.Progress<{ message?: string; increment?: number }>,
-    token?: vscode.CancellationToken
+    token?: vscode.CancellationToken,
+    options: ScanOptions = {}
 ): Promise<ScanSummary> {
-    const uris = await collectFiles(scope, token);
+    const uris = options.files ?? await collectFiles(scope, token);
     const maxBytes = vscode.workspace.getConfiguration('cslediagnostic').get<number>('maxFileSize', 1024) * 1024;
     const summary: ScanSummary = { files: [], scanned: 0, skippedLarge: 0, failed: 0, cancelled: false };
 
@@ -110,6 +118,9 @@ export async function scanScope(
             } catch {
                 summary.failed++;
             } finally {
+                if (options.yieldBetweenFiles) {
+                    await new Promise<void>(resolve => setImmediate(resolve));
+                }
                 progress?.report({
                     message: `${Math.min(next, uris.length)} / ${uris.length}`,
                     increment: uris.length > 0 ? 100 / uris.length : 0,
@@ -118,6 +129,10 @@ export async function scanScope(
         }
     };
     await Promise.all(Array.from({ length: Math.min(CONCURRENCY, uris.length) }, worker));
+
+    if (token?.isCancellationRequested) {
+        summary.cancelled = true;
+    }
 
     summary.files.sort((a, b) => a.uri.fsPath.localeCompare(b.uri.fsPath));
     for (const file of summary.files) {
