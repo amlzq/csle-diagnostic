@@ -6,6 +6,7 @@ import { CsleCodeActionProvider } from './quickfix/codeActionProvider';
 import { prewarmTreeSitterRuntime } from './utils/stringExtractor';
 import { ensureOpenCC } from './utils/opencc';
 import { registerScanCommands } from './commands/diagnosticAll';
+import { scheduleAutoDiagnostic } from './commands/autoDiagnostic';
 import { scanOpenedUris } from './scan/scanState';
 
 const languages = ['dart', 'javascript', 'typescript', 'javascriptreact', 'typescriptreact', 'html', 'css', 'json', 'php', 'python'];
@@ -66,7 +67,8 @@ export async function activate(context: vscode.ExtensionContext) {
         )
     );
 
-    registerScanCommands(context);
+    const store = registerScanCommands(context);
+    context.subscriptions.push(scheduleAutoDiagnostic(store));
 
     setTimeout(() => {
         void prewarmTreeSitterRuntime();

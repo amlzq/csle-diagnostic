@@ -19,5 +19,10 @@
   "Converted {0}.": "已转换 {0} 处。",
   "Apply": "应用",
   "Convert {0} items in {1} files to {2}? Files are not saved; you can undo the changes.": "确定将 {1} 个文件中的 {0} 处转换为{2}吗？文件不会自动保存，修改可以撤销。",
-  "Chinese Expression Diagnostic": "中文表达式诊断"
+  "Chinese Expression Diagnostic": "中文表达式诊断",
+  "Open Settings": "打开设置",
+  "Found {0} files, which exceeds the auto-diagnostic limit of {1}; skipped. Run \"Diagnostic All Files\" manually, or adjust workspaceExclude / autoDiagnosticMaxFiles.": "共 {0} 个文件，超过自动诊断上限 {1}，已跳过。可手动运行「诊断所有文件」，或调整 workspaceExclude / autoDiagnosticMaxFiles。",
+  "Found {0} items to convert in {1} files.": "发现 {1} 个文件中有 {0} 处可转换的内容。",
+  "View Results": "查看结果",
+  "Dismiss": "忽略"
 }

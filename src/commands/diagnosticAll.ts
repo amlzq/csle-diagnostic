@@ -92,7 +92,7 @@ export async function runScan(store: ResultsStore, scope: vscode.Uri[], options:
     return { status: 'done', summary };
 }
 
-export function registerScanCommands(context: vscode.ExtensionContext) {
+export function registerScanCommands(context: vscode.ExtensionContext): ResultsStore {
     const store = new ResultsStore();
     const provider = new ResultsTreeProvider(store);
     const view = vscode.window.createTreeView<ResultNode>(RESULTS_VIEW_ID, { treeDataProvider: provider });

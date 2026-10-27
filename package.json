@@ -25,7 +25,8 @@
     "onLanguage:css",
     "onLanguage:json",
     "onLanguage:php",
-    "onLanguage:python"
+    "onLanguage:python",
+    "workspaceContains:**/*.{dart,js,mjs,cjs,ts,jsx,tsx,html,htm,css,json,php,py}"
   ],
   "main": "./out/extension.js",
   "l10n": "./l10n",
@@ -121,6 +122,21 @@
           "order": 9,
           "default": false,
           "description": "%cslediagnostic.saveAfterApply.desc%"
+        },
+        "cslediagnostic.autoDiagnosticOnOpen": {
+          "type": "boolean",
+          "order": 10,
+          "default": false,
+          "scope": "window",
+          "description": "%cslediagnostic.autoDiagnosticOnOpen.desc%"
+        },
+        "cslediagnostic.autoDiagnosticMaxFiles": {
+          "type": "number",
+          "order": 11,
+          "default": 5000,
+          "minimum": 1,
+          "scope": "window",
+          "description": "%cslediagnostic.autoDiagnosticMaxFiles.desc%"
         }
       }
     },
