@@ -27,5 +27,7 @@
   "cslediagnostic.cmd.acceptAll": "Accept All",
   "cslediagnostic.cmd.acceptFile": "Accept File",
   "cslediagnostic.cmd.acceptItem": "Accept",
-  "cslediagnostic.cmd.dismissItem": "Dismiss"
+  "cslediagnostic.cmd.dismissItem": "Dismiss",
+  "cslediagnostic.previewBeforeApply.desc": "Review the changes in VS Code's Refactor Preview before applying Accept All / Accept File / Accept",
+  "cslediagnostic.saveAfterApply.desc": "Save the modified files after accepting changes (off by default; changes can be undone while unsaved)"
 }

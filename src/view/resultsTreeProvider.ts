@@ -52,6 +52,26 @@ export class ResultsStore {
         this.update();
     }
 
+    /** 重新扫描指定文件并替换其条目（无剩余条目的文件会被移除） */
+    async rescanFiles(
+        uris: vscode.Uri[],
+        scan: (doc: vscode.TextDocument) => Promise<{ findings: Finding[] } | undefined>
+    ) {
+        const targets = new Map(uris.map(u => [u.toString(), u]));
+        const replaced = new Map<string, FileFindings>();
+        for (const [key, uri] of targets) {
+            const doc = await vscode.workspace.openTextDocument(uri);
+            const result = await scan(doc);
+            if (result && result.findings.length > 0) {
+                replaced.set(key, { uri, findings: result.findings.sort((a, b) => a.range.start.compareTo(b.range.start)) });
+            }
+        }
+        this.files = this.files
+            .map(file => replaced.get(file.uri.toString()) ?? (targets.has(file.uri.toString()) ? undefined : file))
+            .filter((file): file is FileFindings => file !== undefined);
+        this.update();
+    }
+
     private update() {
         void vscode.commands.executeCommand('setContext', HAS_RESULTS_CONTEXT, this.files.length > 0);
         this.emitter.fire();

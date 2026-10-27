@@ -109,6 +109,18 @@
           "default": 1024,
           "minimum": 1,
           "description": "%cslediagnostic.maxFileSize.desc%"
+        },
+        "cslediagnostic.previewBeforeApply": {
+          "type": "boolean",
+          "order": 8,
+          "default": false,
+          "description": "%cslediagnostic.previewBeforeApply.desc%"
+        },
+        "cslediagnostic.saveAfterApply": {
+          "type": "boolean",
+          "order": 9,
+          "default": false,
+          "description": "%cslediagnostic.saveAfterApply.desc%"
         }
       }
     },

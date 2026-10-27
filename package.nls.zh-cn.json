@@ -27,5 +27,7 @@
   "cslediagnostic.cmd.acceptAll": "全部接受",
   "cslediagnostic.cmd.acceptFile": "接受本文件",
   "cslediagnostic.cmd.acceptItem": "接受",
-  "cslediagnostic.cmd.dismissItem": "忽略"
+  "cslediagnostic.cmd.dismissItem": "忽略",
+  "cslediagnostic.previewBeforeApply.desc": "在应用「全部接受 / 接受本文件 / 接受」前，通过 VS Code 的重构预览复查修改",
+  "cslediagnostic.saveAfterApply.desc": "接受修改后保存被修改的文件（默认关闭；未保存时可撤销修改）"
 }

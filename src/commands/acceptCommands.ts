@@ -1,14 +1,27 @@
 import * as vscode from 'vscode';
 import { applyFindings } from '../scan/applyFindings';
-import { Finding } from '../scan/scanDocument';
+import { Finding, scanDocument } from '../scan/scanDocument';
 import { getUserConfig } from '../utils/config';
 import { ResultNode, ResultsStore } from '../view/resultsTreeProvider';
 
 async function accept(store: ResultsStore, findings: Finding[]) {
     if (findings.length === 0) {return;}
-    const { applied, stale, failed } = await applyFindings(findings);
-    // 过期条目与已应用条目一并移出列表，避免重复处理；需要时可重新扫描
-    store.resolve(findings, applied);
+    const config = vscode.workspace.getConfiguration('cslediagnostic');
+    const preview = config.get<boolean>('previewBeforeApply', false);
+    const { applied, stale, failed, cancelled } = await applyFindings(findings, {
+        preview,
+        save: config.get<boolean>('saveAfterApply', false),
+    });
+    if (cancelled) {return;}
+
+    if (preview) {
+        // 用户可能在预览中取消勾选了部分修改，无法得知实际应用了哪些，
+        // 因此对涉及的文件重新扫描以得到准确的剩余条目
+        await store.rescanFiles(findings.map(f => f.uri), scanDocument);
+    } else {
+        // 过期条目与已应用条目一并移出列表，避免重复处理；需要时可重新扫描
+        store.resolve(findings, applied);
+    }
 
     if (failed) {
         void vscode.window.showErrorMessage(vscode.l10n.t('Failed to apply the changes.'));

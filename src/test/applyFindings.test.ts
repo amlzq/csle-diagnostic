@@ -38,6 +38,13 @@ suite('应用修改测试', function () {
         assert.strictEqual(fs.readFileSync(path.join(dir, 'a.ts'), 'utf8'), "const a = '简体测试';\nconst b = '软件';\n");
     });
 
+    test('save 选项应在应用后保存文件', async () => {
+        const summary = await scanScope([vscode.Uri.file(dir)]);
+        const result = await applyFindings(summary.files.flatMap(f => f.findings), { save: true });
+        assert.strictEqual(result.applied.length, 3);
+        assert.strictEqual(fs.readFileSync(path.join(dir, 'b.py'), 'utf8'), "s = '簡體測試'\n");
+    });
+
     test('扫描后被修改的条目应被跳过', async () => {
         const summary = await scanScope([vscode.Uri.file(dir)]);
         const findings = summary.files.flatMap(f => f.findings);

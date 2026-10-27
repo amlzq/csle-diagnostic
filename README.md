@@ -6,6 +6,14 @@ In the extension settings view, you can exclude strings in certain locations, su
 
 In the extension settings view, you can modify the Chinese characters glyphs you want to diagnose and the glyphs to quickly fix.
 
+### Diagnose all files
+
+- Command Palette: `Chinese Expression Diagnostic: Diagnostic All Files` scans the whole workspace.
+- Explorer: right-click one or more folders and choose `Diagnostic This Folder`.
+- Results appear in the **Chinese Expression Diagnostic** view in the Explorer, grouped by file with `original → converted`. Click an item to jump to it.
+- Use the buttons to accept or dismiss a single item, accept a whole file, or `Accept All` (after a confirmation). Changes are **not saved** automatically and can be undone; commit your work first anyway.
+- Related settings: `workspaceExclude`, `maxFileSize`, `previewBeforeApply` (review in VS Code's Refactor Preview), `saveAfterApply`.
+
 ### Supported languages
 
 - Dart

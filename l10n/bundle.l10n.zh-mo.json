@@ -18,5 +18,6 @@
   "Converted {0}, skipped {1} that changed since the scan. Rescan to refresh.": "已轉換 {0} 處，略過 {1} 處（掃描後已被修改），請重新掃描。",
   "Converted {0}.": "已轉換 {0} 處。",
   "Apply": "套用",
-  "Convert {0} items in {1} files to {2}? Files are not saved; you can undo the changes.": "確定將 {1} 個檔案中的 {0} 處轉換為{2}嗎？檔案不會自動儲存，修改可以復原。"
+  "Convert {0} items in {1} files to {2}? Files are not saved; you can undo the changes.": "確定將 {1} 個檔案中的 {0} 處轉換為{2}嗎？檔案不會自動儲存，修改可以復原。",
+  "Chinese Expression Diagnostic": "中文表達式診斷"
 }
