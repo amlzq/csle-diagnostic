@@ -1,3 +1,7 @@
+# 0.2.0
+
+- Added "Diagnostic All Files" to check a whole project or folder at once, review the results, and accept all changes in one click, with an optional auto-check when a project opens.
+
 # 0.1.1
 
 - Internal: split integration tests by language and add a unit test suite.

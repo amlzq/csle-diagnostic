@@ -8,12 +8,12 @@ In the extension settings view, you can modify the Chinese characters glyphs you
 
 ### Diagnose all files
 
-- Command Palette: `Chinese Expression Diagnostic: Diagnostic All Files` scans the whole workspace.
-- Explorer: right-click one or more folders and choose `Diagnostic This Folder`.
-- Results appear in the **Chinese Expression Diagnostic** view in the Explorer, grouped by file with `original → converted`. Click an item to jump to it.
-- Use the buttons to accept or dismiss a single item, accept a whole file, or `Accept All` (after a confirmation). Changes are **not saved** automatically and can be undone; commit your work first anyway.
-- Automatic diagnosis: turn on `autoDiagnosticOnOpen` (off by default) to scan the whole workspace a few seconds after a project opens. Results are listed in the view and a non-intrusive notification offers `View Results`; nothing is ever modified automatically. It is skipped in untrusted workspaces and when the workspace has more than `autoDiagnosticMaxFiles` files (default 5000); run the command manually in that case.
-- Related settings: `workspaceExclude`, `maxFileSize`, `previewBeforeApply` (review in VS Code's Refactor Preview), `saveAfterApply`, `autoDiagnosticOnOpen`, `autoDiagnosticMaxFiles`.
+- Command Palette: run `Chinese Expression Diagnostic: Diagnostic All Files` to scan the workspace.
+- Explorer: right-click folders and choose `Diagnostic This Folder`.
+- Results are listed by file in the **Chinese Expression Diagnostic** view; click an item to jump to it.
+- Accept or dismiss one item, accept a file, or `Accept All`. Files are not saved and changes can be undone.
+- Automatic diagnosis: enable `autoDiagnosticOnOpen` (off by default) to scan when a project opens. Nothing is modified automatically.
+- Related settings: `workspaceExclude`, `maxFileSize`, `previewBeforeApply`, `saveAfterApply`, `autoDiagnosticOnOpen`, `autoDiagnosticMaxFiles`.
 
 ### Supported languages
 
