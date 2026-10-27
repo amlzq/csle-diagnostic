@@ -5,6 +5,8 @@ import { refreshDiagnostics } from './diagnostics';
 import { CsleCodeActionProvider } from './quickfix/codeActionProvider';
 import { prewarmTreeSitterRuntime } from './utils/stringExtractor';
 import { ensureOpenCC } from './utils/opencc';
+import { registerScanCommands } from './commands/diagnosticAll';
+import { scanOpenedUris } from './scan/scanState';
 
 const languages = ['dart', 'javascript', 'typescript', 'javascriptreact', 'typescriptreact', 'html', 'css', 'json', 'php', 'python'];
 
@@ -18,6 +20,7 @@ export async function activate(context: vscode.ExtensionContext) {
 
     function requestDiagnostics(doc: vscode.TextDocument) {
         if (!languages.includes(doc.languageId)) {return;}
+        if (scanOpenedUris.has(doc.uri.toString())) {return;}
 
         const key = doc.uri.toString();
         const existing = perDocState.get(key);
@@ -62,6 +65,8 @@ export async function activate(context: vscode.ExtensionContext) {
             { providedCodeActionKinds: [vscode.CodeActionKind.QuickFix] }
         )
     );
+
+    registerScanCommands(context);
 
     setTimeout(() => {
         void prewarmTreeSitterRuntime();

@@ -4,5 +4,14 @@
   "Simplified Chinese": "簡體中文",
   "Chinese (Taiwan)": "中文（台灣）",
   "Chinese (Hong Kong)": "中文（香港）",
-  "Traditional Chinese": "繁體中文"
+  "Traditional Chinese": "繁體中文",
+  "Workspace": "工作區",
+  "Scope: {0} — {1} findings in {2} files": "範圍：{0} — {2} 個檔案中共 {1} 處",
+  "{0} large files skipped": "已略過 {0} 個過大檔案",
+  "Open": "開啟",
+  "Check glyph and convert glyph are the same; nothing to convert.": "檢查字形與轉換字形相同，無需轉換。",
+  "Chinese Expression Diagnostic: scanning…": "中文表達式診斷：正在掃描…",
+  "Scan cancelled.": "已取消掃描。",
+  "No supported files found.": "找不到支援的檔案。",
+  "No content to convert in {0} files.": "已掃描 {0} 個檔案，沒有需要轉換的內容。"
 }

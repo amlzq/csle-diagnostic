@@ -15,5 +15,13 @@
   "cslediagnostic.traditional.hk": "中文（香港）",
   "cslediagnostic.traditional.hk.desc": "檢查中文（香港）",
   "cslediagnostic.traditional": "繁體中文",
-  "cslediagnostic.traditional.desc": "檢查繁體中文"
+  "cslediagnostic.traditional.desc": "檢查繁體中文",
+  "cslediagnostic.workspaceExclude.desc": "診斷所有檔案或資料夾時額外排除的 glob 模式（node_modules、.git、out、dist、build 以及 files.exclude 一律排除）",
+  "cslediagnostic.maxFileSize.desc": "診斷所有檔案或資料夾時掃描的檔案大小上限（KB），超過則略過",
+  "cslediagnostic.cmd.diagnosticAllFiles": "診斷所有檔案",
+  "cslediagnostic.cmd.diagnosticFolder": "診斷此資料夾",
+  "cslediagnostic.cmd.rescan": "重新掃描",
+  "cslediagnostic.cmd.clearResults": "清除結果",
+  "cslediagnostic.cmd.openFinding": "開啟",
+  "cslediagnostic.view.results": "中文表達式診斷"
 }

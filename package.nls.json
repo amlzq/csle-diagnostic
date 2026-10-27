@@ -15,5 +15,13 @@
   "cslediagnostic.traditional.hk": "Chinese (Hong Kong)",
   "cslediagnostic.traditional.hk.desc": "Check for Chinese (as used in Hong Kong)",
   "cslediagnostic.traditional": "Traditional Chinese",
-  "cslediagnostic.traditional.desc": "Check for Traditional Chinese"
+  "cslediagnostic.traditional.desc": "Check for Traditional Chinese",
+  "cslediagnostic.workspaceExclude.desc": "Extra glob patterns excluded when diagnosing all files or a folder (node_modules, .git, out, dist, build and files.exclude are always excluded)",
+  "cslediagnostic.maxFileSize.desc": "Maximum file size (KB) scanned when diagnosing all files or a folder; larger files are skipped",
+  "cslediagnostic.cmd.diagnosticAllFiles": "Diagnostic All Files",
+  "cslediagnostic.cmd.diagnosticFolder": "Diagnostic This Folder",
+  "cslediagnostic.cmd.rescan": "Rescan",
+  "cslediagnostic.cmd.clearResults": "Clear Results",
+  "cslediagnostic.cmd.openFinding": "Open",
+  "cslediagnostic.view.results": "Chinese Expression Diagnostic"
 }

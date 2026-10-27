@@ -93,6 +93,22 @@
           },
           "default": [],
           "description": "%cslediagnostic.excludeNames.desc%"
+        },
+        "cslediagnostic.workspaceExclude": {
+          "type": "array",
+          "order": 6,
+          "items": {
+            "type": "string"
+          },
+          "default": [],
+          "description": "%cslediagnostic.workspaceExclude.desc%"
+        },
+        "cslediagnostic.maxFileSize": {
+          "type": "number",
+          "order": 7,
+          "default": 1024,
+          "minimum": 1,
+          "description": "%cslediagnostic.maxFileSize.desc%"
         }
       }
     },
@@ -198,7 +214,83 @@
           "python"
         ]
       }
-    ]
+    ],
+    "commands": [
+      {
+        "command": "cslediagnostic.diagnosticAllFiles",
+        "category": "%cslediagnostic.display.name%",
+        "title": "%cslediagnostic.cmd.diagnosticAllFiles%"
+      },
+      {
+        "command": "cslediagnostic.diagnosticFolder",
+        "category": "%cslediagnostic.display.name%",
+        "title": "%cslediagnostic.cmd.diagnosticFolder%"
+      },
+      {
+        "command": "cslediagnostic.rescan",
+        "category": "%cslediagnostic.display.name%",
+        "title": "%cslediagnostic.cmd.rescan%",
+        "icon": "$(refresh)"
+      },
+      {
+        "command": "cslediagnostic.clearResults",
+        "category": "%cslediagnostic.display.name%",
+        "title": "%cslediagnostic.cmd.clearResults%",
+        "icon": "$(clear-all)"
+      },
+      {
+        "command": "cslediagnostic.openFinding",
+        "title": "%cslediagnostic.cmd.openFinding%"
+      }
+    ],
+    "views": {
+      "explorer": [
+        {
+          "id": "cslediagnostic.results",
+          "name": "%cslediagnostic.view.results%",
+          "when": "cslediagnostic.hasResults"
+        }
+      ]
+    },
+    "menus": {
+      "commandPalette": [
+        {
+          "command": "cslediagnostic.diagnosticFolder",
+          "when": "false"
+        },
+        {
+          "command": "cslediagnostic.openFinding",
+          "when": "false"
+        },
+        {
+          "command": "cslediagnostic.rescan",
+          "when": "cslediagnostic.hasResults"
+        },
+        {
+          "command": "cslediagnostic.clearResults",
+          "when": "cslediagnostic.hasResults"
+        }
+      ],
+      "explorer/context": [
+        {
+          "command": "cslediagnostic.diagnosticFolder",
+          "when": "explorerResourceIsFolder",
+          "group": "7_modification@99"
+        }
+      ],
+      "view/title": [
+        {
+          "command": "cslediagnostic.rescan",
+          "when": "view == cslediagnostic.results",
+          "group": "navigation@1"
+        },
+        {
+          "command": "cslediagnostic.clearResults",
+          "when": "view == cslediagnostic.results",
+          "group": "navigation@2"
+        }
+      ]
+    }
   },
   "scripts": {
     "vscode:prepublish": "rm -rf out && npm run compile",

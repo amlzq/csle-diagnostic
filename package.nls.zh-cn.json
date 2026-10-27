@@ -15,5 +15,13 @@
   "cslediagnostic.traditional.hk": "中文（香港）",
   "cslediagnostic.traditional.hk.desc": "检查中文（香港）",
   "cslediagnostic.traditional": "繁体中文",
-  "cslediagnostic.traditional.desc": "检查繁体中文"
+  "cslediagnostic.traditional.desc": "检查繁体中文",
+  "cslediagnostic.workspaceExclude.desc": "诊断所有文件或文件夹时额外排除的 glob 模式（node_modules、.git、out、dist、build 以及 files.exclude 始终被排除）",
+  "cslediagnostic.maxFileSize.desc": "诊断所有文件或文件夹时扫描的文件大小上限（KB），超过则跳过",
+  "cslediagnostic.cmd.diagnosticAllFiles": "诊断所有文件",
+  "cslediagnostic.cmd.diagnosticFolder": "诊断此文件夹",
+  "cslediagnostic.cmd.rescan": "重新扫描",
+  "cslediagnostic.cmd.clearResults": "清空结果",
+  "cslediagnostic.cmd.openFinding": "打开",
+  "cslediagnostic.view.results": "中文表达式诊断"
 }
