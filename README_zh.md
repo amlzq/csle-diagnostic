@@ -12,7 +12,8 @@
 - 资源管理器：右键一个或多个文件夹，选择「诊断此文件夹」。
 - 结果显示在资源管理器的「中文表达式诊断」视图中，按文件分组并显示「原文 → 转换后」，点击条目可跳转。
 - 可逐条接受 / 忽略、接受整个文件，或点击「全部接受」（会先确认）。修改**不会自动保存**，可以撤销；仍建议先提交代码。
-- 相关设置：`workspaceExclude`、`maxFileSize`、`previewBeforeApply`（通过 VS Code 重构预览复查）、`saveAfterApply`。
+- 自动诊断：开启 `autoDiagnosticOnOpen`（默认关闭）后，打开项目几秒后会自动扫描整个工作区，结果列在视图中，并以不打扰的通知提供「查看结果」；不会自动修改任何文件。不受信任的工作区、或文件数超过 `autoDiagnosticMaxFiles`（默认 5000）时会跳过，此时请手动运行命令。
+- 相关设置：`workspaceExclude`、`maxFileSize`、`previewBeforeApply`（通过 VS Code 重构预览复查）、`saveAfterApply`、`autoDiagnosticOnOpen`、`autoDiagnosticMaxFiles`。
 
 ### 支持语言
 
