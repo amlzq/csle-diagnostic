@@ -3,6 +3,7 @@ import { getUserConfig } from '../utils/config';
 import { toLocale } from '../utils/utils';
 import { Finding } from '../scan/scanDocument';
 import { scanScope } from '../scan/scanWorkspace';
+import { registerAcceptCommands } from './acceptCommands';
 import { RESULTS_VIEW_ID, ResultNode, ResultsStore, ResultsTreeProvider } from '../view/resultsTreeProvider';
 
 async function runScan(store: ResultsStore, scope: vscode.Uri[]) {
@@ -61,5 +62,6 @@ export function registerScanCommands(context: vscode.ExtensionContext) {
             await vscode.window.showTextDocument(finding.uri, { selection: finding.range, preview: true });
         })
     );
+    registerAcceptCommands(context, store);
     return store;
 }

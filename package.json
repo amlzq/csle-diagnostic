@@ -241,6 +241,30 @@
       {
         "command": "cslediagnostic.openFinding",
         "title": "%cslediagnostic.cmd.openFinding%"
+      },
+      {
+        "command": "cslediagnostic.acceptAll",
+        "category": "%cslediagnostic.display.name%",
+        "title": "%cslediagnostic.cmd.acceptAll%",
+        "icon": "$(check-all)"
+      },
+      {
+        "command": "cslediagnostic.acceptFile",
+        "category": "%cslediagnostic.display.name%",
+        "title": "%cslediagnostic.cmd.acceptFile%",
+        "icon": "$(check-all)"
+      },
+      {
+        "command": "cslediagnostic.acceptItem",
+        "category": "%cslediagnostic.display.name%",
+        "title": "%cslediagnostic.cmd.acceptItem%",
+        "icon": "$(check)"
+      },
+      {
+        "command": "cslediagnostic.dismissItem",
+        "category": "%cslediagnostic.display.name%",
+        "title": "%cslediagnostic.cmd.dismissItem%",
+        "icon": "$(close)"
       }
     ],
     "views": {
@@ -269,6 +293,22 @@
         {
           "command": "cslediagnostic.clearResults",
           "when": "cslediagnostic.hasResults"
+        },
+        {
+          "command": "cslediagnostic.acceptAll",
+          "when": "cslediagnostic.hasResults"
+        },
+        {
+          "command": "cslediagnostic.acceptFile",
+          "when": "false"
+        },
+        {
+          "command": "cslediagnostic.acceptItem",
+          "when": "false"
+        },
+        {
+          "command": "cslediagnostic.dismissItem",
+          "when": "false"
         }
       ],
       "explorer/context": [
@@ -280,6 +320,11 @@
       ],
       "view/title": [
         {
+          "command": "cslediagnostic.acceptAll",
+          "when": "view == cslediagnostic.results",
+          "group": "navigation@0"
+        },
+        {
           "command": "cslediagnostic.rescan",
           "when": "view == cslediagnostic.results",
           "group": "navigation@1"
@@ -287,6 +332,38 @@
         {
           "command": "cslediagnostic.clearResults",
           "when": "view == cslediagnostic.results",
+          "group": "navigation@2"
+        }
+      ],
+      "view/item/context": [
+        {
+          "command": "cslediagnostic.acceptFile",
+          "when": "view == cslediagnostic.results && viewItem == cslediagnostic.file",
+          "group": "inline"
+        },
+        {
+          "command": "cslediagnostic.acceptItem",
+          "when": "view == cslediagnostic.results && viewItem == cslediagnostic.item",
+          "group": "inline@1"
+        },
+        {
+          "command": "cslediagnostic.dismissItem",
+          "when": "view == cslediagnostic.results && viewItem == cslediagnostic.item",
+          "group": "inline@2"
+        },
+        {
+          "command": "cslediagnostic.acceptFile",
+          "when": "view == cslediagnostic.results && viewItem == cslediagnostic.file",
+          "group": "navigation"
+        },
+        {
+          "command": "cslediagnostic.acceptItem",
+          "when": "view == cslediagnostic.results && viewItem == cslediagnostic.item",
+          "group": "navigation@1"
+        },
+        {
+          "command": "cslediagnostic.dismissItem",
+          "when": "view == cslediagnostic.results && viewItem == cslediagnostic.item",
           "group": "navigation@2"
         }
       ]

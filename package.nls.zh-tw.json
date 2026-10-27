@@ -23,5 +23,9 @@
   "cslediagnostic.cmd.rescan": "重新掃描",
   "cslediagnostic.cmd.clearResults": "清除結果",
   "cslediagnostic.cmd.openFinding": "開啟",
-  "cslediagnostic.view.results": "中文表達式診斷"
+  "cslediagnostic.view.results": "中文表達式診斷",
+  "cslediagnostic.cmd.acceptAll": "全部接受",
+  "cslediagnostic.cmd.acceptFile": "接受本檔案",
+  "cslediagnostic.cmd.acceptItem": "接受",
+  "cslediagnostic.cmd.dismissItem": "忽略"
 }

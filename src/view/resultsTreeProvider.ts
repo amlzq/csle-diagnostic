@@ -1,6 +1,7 @@
 import * as vscode from 'vscode';
 import { Finding } from '../scan/scanDocument';
 import { FileFindings, ScanSummary } from '../scan/scanWorkspace';
+import { shiftFinding } from '../scan/applyFindings';
 
 export const RESULTS_VIEW_ID = 'cslediagnostic.results';
 const HAS_RESULTS_CONTEXT = 'cslediagnostic.hasResults';
@@ -33,6 +34,21 @@ export class ResultsStore {
     clear() {
         this.files = [];
         this.summary = undefined;
+        this.update();
+    }
+
+    /**
+     * 移除已处理的条目；applied 为其中已写入文档的条目，
+     * 用于修正同一行内剩余条目的列号。
+     */
+    resolve(processed: Finding[], applied: Finding[] = []) {
+        const done = new Set(processed);
+        this.files = this.files
+            .map(file => ({
+                uri: file.uri,
+                findings: file.findings.filter(f => !done.has(f)).map(f => shiftFinding(f, applied)),
+            }))
+            .filter(file => file.findings.length > 0);
         this.update();
     }
 

@@ -23,5 +23,9 @@
   "cslediagnostic.cmd.rescan": "Rescan",
   "cslediagnostic.cmd.clearResults": "Clear Results",
   "cslediagnostic.cmd.openFinding": "Open",
-  "cslediagnostic.view.results": "Chinese Expression Diagnostic"
+  "cslediagnostic.view.results": "Chinese Expression Diagnostic",
+  "cslediagnostic.cmd.acceptAll": "Accept All",
+  "cslediagnostic.cmd.acceptFile": "Accept File",
+  "cslediagnostic.cmd.acceptItem": "Accept",
+  "cslediagnostic.cmd.dismissItem": "Dismiss"
 }

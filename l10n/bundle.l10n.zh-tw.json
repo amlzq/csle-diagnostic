@@ -13,5 +13,10 @@
   "Chinese Expression Diagnostic: scanning…": "中文表達式診斷：正在掃描…",
   "Scan cancelled.": "已取消掃描。",
   "No supported files found.": "找不到支援的檔案。",
-  "No content to convert in {0} files.": "已掃描 {0} 個檔案，沒有需要轉換的內容。"
+  "No content to convert in {0} files.": "已掃描 {0} 個檔案，沒有需要轉換的內容。",
+  "Failed to apply the changes.": "套用修改失敗。",
+  "Converted {0}, skipped {1} that changed since the scan. Rescan to refresh.": "已轉換 {0} 處，略過 {1} 處（掃描後已被修改），請重新掃描。",
+  "Converted {0}.": "已轉換 {0} 處。",
+  "Apply": "套用",
+  "Convert {0} items in {1} files to {2}? Files are not saved; you can undo the changes.": "確定將 {1} 個檔案中的 {0} 處轉換為{2}嗎？檔案不會自動儲存，修改可以復原。"
 }
