@@ -2,6 +2,7 @@ import * as vscode from 'vscode';
 import { getUserConfig } from '../utils/config';
 import { shouldExclude } from '../utils/excludeNames';
 import { convertLiteral } from '../utils/convertLiteral';
+import { getCustomEntries } from '../utils/dictionaryStore';
 import { createConverter, Locale } from '../utils/opencc';
 import {
     extractCssStrings,
@@ -59,7 +60,7 @@ export async function scanDocument(doc: vscode.TextDocument): Promise<ScanResult
     const { checkGlyph, convertGlyph, excludeNames, checkLiteralExpression, checkDocComment } = getUserConfig(doc);
     const from = toLocale(checkGlyph);
     const to = toLocale(convertGlyph);
-    const converter = createConverter(from, to);
+    const converter = createConverter(from, to, getCustomEntries(to));
 
     const matches = await target.extract(doc, {
         includeLiteralExpression: checkLiteralExpression,

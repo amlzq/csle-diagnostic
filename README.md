@@ -15,6 +15,10 @@ In the extension settings view, you can modify the Chinese characters glyphs you
 - Automatic diagnosis: enable `autoDiagnosticOnOpen` (off by default) to scan when a project opens. Nothing is modified automatically.
 - Related settings: `workspaceExclude`, `maxFileSize`, `previewBeforeApply`, `saveAfterApply`, `autoDiagnosticOnOpen`, `autoDiagnosticMaxFiles`.
 
+### Custom dictionary
+
+Import a text file with one `source<Tab>target[<Tab>locale]` entry per line (`#` starts a comment; the optional locale `cn`/`twp`/`hk`/`t` limits the entry to that conversion target and takes priority over a generic entry) via the `cslediagnostic.customDictionary` setting or the **Import Custom Dictionary…** command. Run **Open Custom Dictionary Template** for an example. Custom entries win over the built-in conversion, and mapping a word to itself keeps it unchanged.
+
 ### Supported languages
 
 - Dart

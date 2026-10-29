@@ -7,12 +7,14 @@ import { prewarmTreeSitterRuntime } from './utils/stringExtractor';
 import { ensureOpenCC } from './utils/opencc';
 import { registerScanCommands } from './commands/diagnosticAll';
 import { scheduleAutoDiagnostic } from './commands/autoDiagnostic';
+import { registerDictionary, onDidChangeDictionary } from './utils/dictionaryStore';
 import { scanOpenedUris } from './scan/scanState';
 
 const languages = ['dart', 'javascript', 'typescript', 'javascriptreact', 'typescriptreact', 'html', 'css', 'json', 'php', 'python'];
 
 export async function activate(context: vscode.ExtensionContext) {
     await ensureOpenCC();
+    await registerDictionary(context);
 
     const diagnosticCollection = vscode.languages.createDiagnosticCollection('cslediagnostic');
     context.subscriptions.push(diagnosticCollection);
@@ -50,6 +52,9 @@ export async function activate(context: vscode.ExtensionContext) {
     context.subscriptions.push(
         vscode.workspace.onDidOpenTextDocument(requestDiagnostics),
         vscode.workspace.onDidChangeTextDocument(e => requestDiagnostics(e.document)),
+        onDidChangeDictionary(() => {
+            vscode.workspace.textDocuments.forEach(requestDiagnostics);
+        }),
         vscode.workspace.onDidChangeConfiguration(() => {
             vscode.workspace.textDocuments.forEach(requestDiagnostics);
         }),

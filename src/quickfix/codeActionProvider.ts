@@ -1,5 +1,6 @@
 import * as vscode from 'vscode';
 import { getUserConfig } from '../utils/config';
+import { getCustomEntries } from '../utils/dictionaryStore';
 import { createConverter } from '../utils/opencc';
 import { convertLiteral } from '../utils/convertLiteral';
 import { toLocale } from '../utils/utils';
@@ -16,7 +17,7 @@ export class CsleCodeActionProvider implements vscode.CodeActionProvider {
         const { checkGlyph, convertGlyph } = getUserConfig(document);
         const from = toLocale(checkGlyph);
         const to = toLocale(convertGlyph);
-        const converter = createConverter(from, to);
+        const converter = createConverter(from, to, getCustomEntries(to));
 
         for (const diagnostic of context.diagnostics) {
             if (diagnostic.code !== 'csle-convert') {continue;}

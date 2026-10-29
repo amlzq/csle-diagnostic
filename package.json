@@ -137,6 +137,12 @@
           "minimum": 1,
           "scope": "window",
           "description": "%cslediagnostic.autoDiagnosticMaxFiles.desc%"
+        },
+        "cslediagnostic.customDictionary": {
+          "type": "string",
+          "order": 12,
+          "default": "",
+          "markdownDescription": "%cslediagnostic.customDictionary.desc%"
         }
       }
     },
@@ -244,6 +250,16 @@
       }
     ],
     "commands": [
+      {
+        "command": "cslediagnostic.importDictionary",
+        "category": "%cslediagnostic.display.name%",
+        "title": "%cslediagnostic.cmd.importDictionary%"
+      },
+      {
+        "command": "cslediagnostic.openDictionaryTemplate",
+        "category": "%cslediagnostic.display.name%",
+        "title": "%cslediagnostic.cmd.openDictionaryTemplate%"
+      },
       {
         "command": "cslediagnostic.diagnosticAllFiles",
         "category": "%cslediagnostic.display.name%",

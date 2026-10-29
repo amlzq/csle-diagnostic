@@ -31,5 +31,8 @@
   "cslediagnostic.previewBeforeApply.desc": "在套用「全部接受 / 接受本檔案 / 接受」前，透過 VS Code 的重構預覽複查修改",
   "cslediagnostic.saveAfterApply.desc": "接受修改後儲存被修改的檔案（預設關閉；未儲存時可復原修改）",
   "cslediagnostic.autoDiagnosticOnOpen.desc": "開啟專案後自動診斷整個工作區，並將結果列在「中文表達式診斷」檢視中。不會自動修改任何檔案。大型專案可能耗時，可用 workspaceExclude / maxFileSize 限制範圍。不受信任的工作區不會自動診斷。",
-  "cslediagnostic.autoDiagnosticMaxFiles.desc": "開啟專案時自動診斷的檔案數上限；工作區檔案數超過該值時略過自動診斷（手動命令不受限制）。"
+  "cslediagnostic.autoDiagnosticMaxFiles.desc": "開啟專案時自動診斷的檔案數上限；工作區檔案數超過該值時略過自動診斷（手動命令不受限制）。",
+  "cslediagnostic.customDictionary.desc": "自訂詞典檔案路徑（每行一條 `來源詞<Tab>目標詞`，`#` 開頭為註解）。詞條優先於內建轉換。[匯入…](command:cslediagnostic.importDictionary) · [開啟範本](command:cslediagnostic.openDictionaryTemplate)",
+  "cslediagnostic.cmd.importDictionary": "匯入自訂詞典…",
+  "cslediagnostic.cmd.openDictionaryTemplate": "開啟自訂詞典範本"
 }

@@ -31,5 +31,8 @@
   "cslediagnostic.previewBeforeApply.desc": "Review the changes in VS Code's Refactor Preview before applying Accept All / Accept File / Accept",
   "cslediagnostic.saveAfterApply.desc": "Save the modified files after accepting changes (off by default; changes can be undone while unsaved)",
   "cslediagnostic.autoDiagnosticOnOpen.desc": "Automatically diagnose the whole workspace after opening a project and list the results in the Chinese Expression Diagnostic view. Files are never modified automatically. Large projects may take a while; use workspaceExclude / maxFileSize to limit the scope. Not applied in untrusted workspaces.",
-  "cslediagnostic.autoDiagnosticMaxFiles.desc": "Maximum number of files for automatic diagnosis on open; if the workspace has more files, the automatic run is skipped (the manual command is not limited)."
+  "cslediagnostic.autoDiagnosticMaxFiles.desc": "Maximum number of files for automatic diagnosis on open; if the workspace has more files, the automatic run is skipped (the manual command is not limited).",
+  "cslediagnostic.customDictionary.desc": "Path to a custom dictionary file (one `source<Tab>target` entry per line, `#` for comments). Entries take priority over built-in conversion. [Import…](command:cslediagnostic.importDictionary) · [Open template](command:cslediagnostic.openDictionaryTemplate)",
+  "cslediagnostic.cmd.importDictionary": "Import Custom Dictionary…",
+  "cslediagnostic.cmd.openDictionaryTemplate": "Open Custom Dictionary Template"
 }

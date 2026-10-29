@@ -24,5 +24,11 @@
   "Found {0} files, which exceeds the auto-diagnostic limit of {1}; skipped. Run \"Diagnostic All Files\" manually, or adjust workspaceExclude / autoDiagnosticMaxFiles.": "共 {0} 個檔案，超過自動診斷上限 {1}，已略過。可手動執行「診斷所有檔案」，或調整 workspaceExclude / autoDiagnosticMaxFiles。",
   "Found {0} items to convert in {1} files.": "發現 {1} 個檔案中有 {0} 處可轉換的內容。",
   "View Results": "查看結果",
-  "Dismiss": "忽略"
+  "Dismiss": "忽略",
+  "Custom dictionary: {0} invalid lines skipped (first: line {1}).": "自訂詞典：已略過 {0} 行無效內容（第一個在第 {1} 行）。",
+  "Cannot read custom dictionary: {0}": "無法讀取自訂詞典：{0}",
+  "Dictionary": "詞典",
+  "No valid entries found in the selected file.": "所選檔案中沒有有效詞條。",
+  "Imported {0} entries; {1} invalid lines skipped.": "已匯入 {0} 個詞條，略過 {1} 行無效內容。",
+  "Imported {0} entries.": "已匯入 {0} 個詞條。"
 }

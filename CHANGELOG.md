@@ -1,3 +1,7 @@
+# Next
+
+- Added a custom dictionary: import a `source<Tab>target[<Tab>locale]` text file (settings page link or "Import Custom Dictionary…" command). Custom entries take priority over the built-in conversion; mapping a word to itself keeps it unchanged.
+
 # 0.2.0
 
 - Added "Diagnostic All Files" to check a whole project or folder at once, review the results, and accept all changes in one click, with an optional auto-check when a project opens.
