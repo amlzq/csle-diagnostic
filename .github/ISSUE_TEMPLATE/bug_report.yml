@@ -1,0 +1,74 @@
+name: Bug report / 问题反馈
+description: Wrong, missing or unexpected diagnostics or quick fixes / 诊断或快速修复结果不正确、遗漏或异常
+labels: [bug]
+body:
+  - type: input
+    id: version
+    attributes:
+      label: Extension version / 扩展版本
+      placeholder: "0.1.1"
+    validations:
+      required: true
+  - type: input
+    id: vscode
+    attributes:
+      label: VS Code version / VS Code 版本
+      description: Help > About / 帮助 > 关于
+      placeholder: "1.100.0"
+    validations:
+      required: true
+  - type: dropdown
+    id: language
+    attributes:
+      label: Language / 语言
+      options:
+        - Dart
+        - JavaScript
+        - TypeScript
+        - JSX / TSX
+        - HTML
+        - CSS
+        - JSON
+        - PHP
+        - Python
+        - Other / 其他
+    validations:
+      required: true
+  - type: dropdown
+    id: kind
+    attributes:
+      label: Problem type / 问题类型
+      options:
+        - False positive (reported but should not be) / 误报
+        - False negative (not reported but should be) / 漏报
+        - Wrong conversion result / 转换结果不正确
+        - Quick fix not shown or fails / 快速修复缺失或失败
+        - Performance or crash / 性能或崩溃
+        - Other / 其他
+    validations:
+      required: true
+  - type: textarea
+    id: sample
+    attributes:
+      label: Code sample / 代码示例
+      description: Minimal snippet that reproduces the problem. / 能复现问题的最小代码片段。
+      render: text
+    validations:
+      required: true
+  - type: textarea
+    id: settings
+    attributes:
+      label: Related settings / 相关设置
+      description: Values of `cslediagnostic.*` (checkGlyph, convertGlyph, checkLiteralExpression, checkDocComment, excludeNames). / 请贴出 `cslediagnostic.*` 的相关取值。
+      render: json
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected vs actual / 期望与实际结果
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs or screenshots / 日志或截图
+      description: Output panel or Developer Tools console errors, if any. / 如有，请附上输出面板或开发者工具控制台的错误。

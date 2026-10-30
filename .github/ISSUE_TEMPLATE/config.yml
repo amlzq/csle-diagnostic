@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: IntelliJ plugin issues / IntelliJ 插件问题
+    url: https://github.com/amlzq/CsleInspection/issues
+    about: Issues for the JetBrains plugin go to the CsleInspection repository. / JetBrains 插件的问题请到 CsleInspection 仓库反馈。

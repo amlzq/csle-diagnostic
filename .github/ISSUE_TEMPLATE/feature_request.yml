@@ -1,0 +1,28 @@
+name: Feature request / 功能建议
+description: Suggest an improvement or support for a new language / 建议新功能或支持新的语言
+labels: [enhancement]
+body:
+  - type: dropdown
+    id: type
+    attributes:
+      label: Request type / 建议类型
+      options:
+        - Support a new language / 支持新语言
+        - New or changed setting / 新增或调整设置项
+        - Improve diagnostics or quick fix / 改进诊断或快速修复
+        - Other / 其他
+    validations:
+      required: true
+  - type: textarea
+    id: description
+    attributes:
+      label: Description / 描述
+      description: What do you need and why? For a new language, name it and where Chinese string literals or comments appear in it. / 需求和原因。若是新语言，请说明语言名称，以及字符串字面量、注释的写法。
+    validations:
+      required: true
+  - type: textarea
+    id: sample
+    attributes:
+      label: Example code / 示例代码
+      description: For a new language, include string and comment syntax (and doc comment syntax, if any). / 新语言请提供字符串与注释语法（如有文档注释也请说明）。
+      render: text
