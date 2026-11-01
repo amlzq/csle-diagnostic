@@ -17,7 +17,7 @@ In the extension settings view, you can modify the Chinese characters glyphs you
 
 ### Custom dictionary
 
-Import a text file with one `source<Tab>target[<Tab>locale]` entry per line (`#` starts a comment; the optional locale `cn`/`twp`/`hk`/`t` limits the entry to that conversion target and takes priority over a generic entry) via the `cslediagnostic.customDictionary` setting or the **Import Custom Dictionary…** command. Run **Open Custom Dictionary Template** for an example. Custom entries win over the built-in conversion, and mapping a word to itself keeps it unchanged.
+Import a text file with one `source<Tab>target` entry per line in OpenCC dictionary format (`#` starts a comment; extra candidates after the first are ignored). Each file is bound to a conversion target (`*` for all, or `cn`/`twp`/`hk`/`t`); a target-specific file overrides `*` via the `cslediagnostic.customDictionary` setting (an object mapping target to file path) or the **Import Custom Dictionary…** command. Run **Open Custom Dictionary Template** for an example. Custom entries win over the built-in conversion, and mapping a word to itself keeps it unchanged.
 
 ### Supported languages
 

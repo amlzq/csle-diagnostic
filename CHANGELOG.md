@@ -1,6 +1,6 @@
 # Next
 
-- Added a custom dictionary: import a `source<Tab>target[<Tab>locale]` text file (settings page link or "Import Custom Dictionary…" command). Custom entries take priority over the built-in conversion; mapping a word to itself keeps it unchanged.
+- Added a custom dictionary: import a OpenCC-format (`source<Tab>target`) text file per conversion target (settings page link or "Import Custom Dictionary…" command). Custom entries take priority over the built-in conversion; mapping a word to itself keeps it unchanged.
 
 # 0.2.0
 

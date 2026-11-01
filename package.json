@@ -139,9 +139,17 @@
           "description": "%cslediagnostic.autoDiagnosticMaxFiles.desc%"
         },
         "cslediagnostic.customDictionary": {
-          "type": "string",
+          "type": "object",
           "order": 12,
-          "default": "",
+          "default": {},
+          "additionalProperties": false,
+          "properties": {
+            "*": { "type": "string" },
+            "cn": { "type": "string" },
+            "twp": { "type": "string" },
+            "hk": { "type": "string" },
+            "t": { "type": "string" }
+          },
           "markdownDescription": "%cslediagnostic.customDictionary.desc%"
         }
       }
