@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 import { ensureOpenCC, createConverter } from '../../utils/opencc.js';
-import { parseDictionary } from '../../utils/customDict.js';
+import { parseDictionary, upsertEntry, removeEntry } from '../../utils/customDict.js';
 
 suite('自定义词典', function () {
     suite('parseDictionary', () => {
@@ -23,6 +23,29 @@ suite('自定义词典', function () {
         test('重复词条以后者为准', () => {
             const r = parseDictionary('软件\tA\n软件\tB\n');
             assert.deepStrictEqual(r.entries, [['软件', 'B']]);
+        });
+    });
+
+    suite('增删词条文本', () => {
+        test('upsertEntry 追加新词条并保留注释', () => {
+            assert.strictEqual(upsertEntry('# 注释\n软件\tA\n', '网络', 'N'), '# 注释\n软件\tA\n网络\tN\n');
+            assert.strictEqual(upsertEntry('', '软件', 'A'), '软件\tA\n');
+        });
+
+        test('upsertEntry 替换同名词条且只留一条', () => {
+            assert.strictEqual(upsertEntry('软件\tA\n网络\tN\n软件\tB\n', '软件', 'C'), '网络\tN\n软件\tC\n');
+        });
+
+        test('upsertEntry 保持 CRLF', () => {
+            assert.strictEqual(upsertEntry('软件\tA\r\n', '网络', 'N'), '软件\tA\r\n网络\tN\r\n');
+        });
+
+        test('removeEntry 删除所有同名词条，不动注释', () => {
+            assert.strictEqual(removeEntry('# 注释\n软件\tA\n网络\tN\n软件\tB\n', '软件'), '# 注释\n网络\tN\n');
+        });
+
+        test('removeEntry 源词不存在时内容不变', () => {
+            assert.strictEqual(removeEntry('软件\tA\n', '网络'), '软件\tA\n');
         });
     });
 

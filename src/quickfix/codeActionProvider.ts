@@ -35,6 +35,18 @@ export class CsleCodeActionProvider implements vscode.CodeActionProvider {
             action.diagnostics = [diagnostic];
             action.isPreferred = true;
             actions.push(action);
+
+            const addAction = new vscode.CodeAction(
+                vscode.l10n.t('Add to custom dictionary…'),
+                vscode.CodeActionKind.QuickFix
+            );
+            addAction.command = {
+                command: 'cslediagnostic.addDictionaryEntry',
+                title: addAction.title,
+                arguments: [original],
+            };
+            addAction.diagnostics = [diagnostic];
+            actions.push(addAction);
         }
         return actions;
     }

@@ -31,6 +31,20 @@
   "Imported {0} entries; {1} invalid lines skipped.": "已导入 {0} 个词条，跳过 {1} 行无效内容。",
   "Imported {0} entries.": "已导入 {0} 个词条。",
   "Custom dictionary {0}: {1} invalid lines skipped (first: line {2}).": "自定义词典 {0}：已跳过 {1} 行无效内容（首个在第 {2} 行）。",
-  "All targets": "全部目标",
-  "Convert target this dictionary applies to": "此词典适用的转换目标"
+  "Overwrite existing dictionary {0}?": "确定覆盖现有词典 {0}？",
+  "Overwrite": "覆盖",
+  "Add Custom Dictionary Entry ({0})": "添加自定义词典词条（{0}）",
+  "From: source word (any glyph)": "From：源词（任意字形）",
+  "To: replacement for \"{0}\"": "To：「{0}」的替换词",
+  "Must not be empty": "不能为空",
+  "Must not contain tabs": "不能包含制表符",
+  "Must not contain whitespace": "不能包含空白字符",
+  "Saved: {0} → {1}": "已保存：{0} → {1}",
+  "Edit": "编辑",
+  "Delete": "删除",
+  "Custom Dictionary ({0})": "自定义词典（{0}）",
+  "$(add) Add entry…": "$(add) 添加词条…",
+  "$(file-add) Import file…": "$(file-add) 导入文件…",
+  "$(go-to-file) Open dictionary file": "$(go-to-file) 打开词典文件",
+  "Add to custom dictionary…": "添加到自定义词典…"
 }

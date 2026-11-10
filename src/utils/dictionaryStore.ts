@@ -1,83 +1,72 @@
 import * as vscode from 'vscode';
 import * as fs from 'fs/promises';
 import * as path from 'path';
-import { DictEntry, parseDictionary } from './customDict';
+import { DictEntry, parseDictionary, removeEntry, upsertEntry } from './customDict';
+import { getUserConfig } from './config';
+import { toLocale } from './utils';
 
-/** 词典按转换目标分文件：`*` 对所有目标生效，其余键对应 opencc 的目标字形。 */
-export const DICT_KEYS = ['*', 'cn', 'twp', 'hk', 't'] as const;
-type DictKey = typeof DICT_KEYS[number];
+/** 词典按「转换字形」分文件：目录下为 cn.txt / twp.txt / hk.txt / t.txt，与源词字形无关。 */
+const LOCALES = ['cn', 'twp', 'hk', 't'] as const;
 
 export const DICTIONARY_TEMPLATE = [
     '# 自定义词典 / Custom dictionary (OpenCC format)',
     '# 一行一条：源词<Tab>目标词1 目标词2（有多个候选时取第一个）；# 开头为注释。',
-    '# 源词按「检查字形」填写；目标词与源词相同表示固定该词、不做转换。',
+    '# 源词可以是任意字形的写法，命中即转换为目标词；目标词与源词相同表示固定该词、不做转换。',
     '服务器\t伺服器',
     '软件\t軟體',
     '',
 ].join('\n');
 
-const entriesByKey = new Map<DictKey, ReadonlyArray<DictEntry>>();
+let storageDir = '';
+const entriesByLocale = new Map<string, ReadonlyArray<DictEntry>>();
 const changeEmitter = new vscode.EventEmitter<void>();
 
 export const onDidChangeDictionary = changeEmitter.event;
 
-/** 返回对转换目标 `to`（cn / twp / hk / t）生效的词条：特定目标的词典优先于 `*`。 */
+/** 返回转换到字形 `to`（cn / twp / hk / t）时生效的词条。 */
 export function getCustomEntries(to: string): Array<[string, string]> {
-    const merged = new Map<string, string>();
-    for (const key of ['*', to]) {
-        for (const [s, t] of entriesByKey.get(key as DictKey) ?? []) {merged.set(s, t);}
-    }
-    return [...merged];
+    return [...(entriesByLocale.get(to) ?? [])];
 }
 
-function configuredPaths(): Partial<Record<DictKey, string>> {
-    const raw = vscode.workspace.getConfiguration('cslediagnostic')
-        .get<Record<string, string>>('customDictionary', {});
-    const folder = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath ?? '';
-    const result: Partial<Record<DictKey, string>> = {};
-    for (const key of DICT_KEYS) {
-        const p = raw[key]?.trim();
-        if (p) {result[key] = p.replace(/\$\{workspaceFolder\}/g, folder);}
-    }
-    return result;
+function dictionaryDirectory(): string {
+    return storageDir;
 }
 
-/** 读取并解析所有已配置的词典文件；文件缺失或有格式错误时不影响基础转换。 */
+function dictionaryFile(locale: string): string {
+    return path.join(dictionaryDirectory(), `${locale}.txt`);
+}
+
+/** 读取并解析目录下的词典文件；文件缺失视为没有词条，格式错误时只弹警告。 */
 export async function reloadDictionary(): Promise<void> {
-    entriesByKey.clear();
-    for (const [key, file] of Object.entries(configuredPaths()) as Array<[DictKey, string]>) {
+    entriesByLocale.clear();
+    for (const locale of LOCALES) {
+        const file = dictionaryFile(locale);
+        let text: string;
         try {
-            const { entries, errors } = parseDictionary(await fs.readFile(file, 'utf8'));
-            entriesByKey.set(key, entries);
-            if (errors.length > 0) {
-                void vscode.window.showWarningMessage(vscode.l10n.t(
-                    'Custom dictionary {0}: {1} invalid lines skipped (first: line {2}).',
-                    file, errors.length, errors[0].line));
+            text = await fs.readFile(file, 'utf8');
+        } catch (e) {
+            if ((e as NodeJS.ErrnoException).code !== 'ENOENT') {
+                void vscode.window.showWarningMessage(vscode.l10n.t('Cannot read custom dictionary: {0}', file));
             }
-        } catch {
-            void vscode.window.showWarningMessage(vscode.l10n.t('Cannot read custom dictionary: {0}', file));
+            continue;
+        }
+        const { entries, errors } = parseDictionary(text);
+        entriesByLocale.set(locale, entries);
+        if (errors.length > 0) {
+            void vscode.window.showWarningMessage(vscode.l10n.t(
+                'Custom dictionary {0}: {1} invalid lines skipped (first: line {2}).',
+                file, errors.length, errors[0].line));
         }
     }
     changeEmitter.fire();
 }
 
-function keyLabel(key: DictKey): string {
-    switch (key) {
-        case '*': return vscode.l10n.t('All targets');
-        case 'cn': return vscode.l10n.t('Simplified Chinese');
-        case 'twp': return vscode.l10n.t('Chinese (Taiwan)');
-        case 'hk': return vscode.l10n.t('Chinese (Hong Kong)');
-        case 't': return vscode.l10n.t('Traditional Chinese');
-    }
+function currentConvertLocale(): string {
+    return toLocale(getUserConfig().convertGlyph);
 }
 
-/** 选择目标字形与词典文件，校验后复制到扩展存储目录并写入设置。 */
-async function importDictionary(context: vscode.ExtensionContext): Promise<void> {
-    const choice = await vscode.window.showQuickPick(
-        DICT_KEYS.map(key => ({ label: keyLabel(key), description: key, key })),
-        { placeHolder: vscode.l10n.t('Convert target this dictionary applies to') });
-    if (!choice) {return;}
-
+/** 选择词典文件，校验后复制为当前「转换字形」对应的词典。 */
+async function importDictionary(): Promise<void> {
     const picked = await vscode.window.showOpenDialog({
         canSelectMany: false,
         filters: { [vscode.l10n.t('Dictionary')]: ['txt', 'tsv'] },
@@ -97,13 +86,16 @@ async function importDictionary(context: vscode.ExtensionContext): Promise<void>
         return;
     }
 
-    const dir = context.globalStorageUri.fsPath;
-    await fs.mkdir(dir, { recursive: true });
-    const target = path.join(dir, `custom-dictionary.${choice.key === '*' ? 'all' : choice.key}.txt`);
+    const target = dictionaryFile(currentConvertLocale());
+    const exists = await fs.access(target).then(() => true, () => false);
+    if (exists) {
+        const overwrite = vscode.l10n.t('Overwrite');
+        const answer = await vscode.window.showWarningMessage(
+            vscode.l10n.t('Overwrite existing dictionary {0}?', target), { modal: true }, overwrite);
+        if (answer !== overwrite) {return;}
+    }
+    await fs.mkdir(path.dirname(target), { recursive: true });
     await fs.writeFile(target, text, 'utf8');
-    const config = vscode.workspace.getConfiguration('cslediagnostic');
-    const current = config.get<Record<string, string>>('customDictionary', {});
-    await config.update('customDictionary', { ...current, [choice.key]: target }, vscode.ConfigurationTarget.Global);
     await reloadDictionary();
 
     void vscode.window.showInformationMessage(errors.length > 0
@@ -111,39 +103,139 @@ async function importDictionary(context: vscode.ExtensionContext): Promise<void>
         : vscode.l10n.t('Imported {0} entries.', entries.length));
 }
 
-async function openTemplate(): Promise<void> {
-    const doc = await vscode.workspace.openTextDocument({ content: DICTIONARY_TEMPLATE, language: 'plaintext' });
-    await vscode.window.showTextDocument(doc);
+/** 打开当前「转换字形」对应的词典，不存在则用模板创建。 */
+async function editDictionary(): Promise<void> {
+    const file = dictionaryFile(currentConvertLocale());
+    await fs.mkdir(path.dirname(file), { recursive: true });
+    await fs.writeFile(file, DICTIONARY_TEMPLATE, { encoding: 'utf8', flag: 'wx' }).catch(e => {
+        if ((e as NodeJS.ErrnoException).code !== 'EEXIST') {throw e;}
+    });
+    await vscode.window.showTextDocument(await vscode.workspace.openTextDocument(vscode.Uri.file(file)));
+}
+
+async function readCurrentText(file: string): Promise<string> {
+    return fs.readFile(file, 'utf8').catch(() => '');
+}
+
+async function writeCurrentText(file: string, text: string): Promise<void> {
+    await fs.mkdir(path.dirname(file), { recursive: true });
+    await fs.writeFile(file, text, 'utf8');
+    await reloadDictionary();
+}
+
+/** 去掉字符串字面量两侧的引号与前缀，作为添加词条时 From 的预填值。 */
+function stripQuotes(text: string): string {
+    return text.replace(/^[rR]?("""|'''|["'`])/, '').replace(/("""|'''|["'`])$/, '');
+}
+
+/** 依次输入 From / To，写入当前「转换字形」对应的词典；已有同名源词则替换。 */
+async function addEntry(initialSource?: unknown): Promise<boolean> {
+    const file = dictionaryFile(currentConvertLocale());
+    const glyph = getUserConfig().convertGlyph;
+
+    let prefill = typeof initialSource === 'string' ? stripQuotes(initialSource) : '';
+    const editor = vscode.window.activeTextEditor;
+    if (prefill === '' && editor && !editor.selection.isEmpty && editor.selection.isSingleLine) {
+        prefill = editor.document.getText(editor.selection);
+    }
+
+    const source = (await vscode.window.showInputBox({
+        title: vscode.l10n.t('Add Custom Dictionary Entry ({0})', glyph),
+        prompt: vscode.l10n.t('From: source word (any glyph)'),
+        value: prefill.trim(),
+        ignoreFocusOut: true,
+        validateInput: v => v.trim() === '' ? vscode.l10n.t('Must not be empty')
+            : /\t/.test(v) ? vscode.l10n.t('Must not contain tabs') : undefined,
+    }))?.trim();
+    if (!source) {return false;}
+
+    const text = await readCurrentText(file);
+    const existing = parseDictionary(text).entries.find(([s]) => s === source)?.[1];
+    const target = (await vscode.window.showInputBox({
+        title: vscode.l10n.t('Add Custom Dictionary Entry ({0})', glyph),
+        prompt: vscode.l10n.t('To: replacement for "{0}"', source),
+        value: existing ?? '',
+        ignoreFocusOut: true,
+        validateInput: v => v.trim() === '' ? vscode.l10n.t('Must not be empty')
+            : /\s/.test(v.trim()) ? vscode.l10n.t('Must not contain whitespace') : undefined,
+    }))?.trim();
+    if (!target) {return false;}
+
+    await writeCurrentText(file, upsertEntry(text, source, target));
+    void vscode.window.showInformationMessage(vscode.l10n.t('Saved: {0} → {1}', source, target));
+    return true;
+}
+
+interface ManageItem extends vscode.QuickPickItem {
+    action?: 'add' | 'import' | 'open';
+    source?: string;
+}
+
+/** 列出当前词典的词条，可新增、编辑、删除、导入或打开文件。 */
+async function manageDictionary(): Promise<void> {
+    const file = dictionaryFile(currentConvertLocale());
+    const editButton: vscode.QuickInputButton = {
+        iconPath: new vscode.ThemeIcon('edit'), tooltip: vscode.l10n.t('Edit') };
+    const deleteButton: vscode.QuickInputButton = {
+        iconPath: new vscode.ThemeIcon('trash'), tooltip: vscode.l10n.t('Delete') };
+
+    const quickPick = vscode.window.createQuickPick<ManageItem>();
+    quickPick.title = vscode.l10n.t('Custom Dictionary ({0})', getUserConfig().convertGlyph);
+    quickPick.matchOnDescription = true;
+
+    const refresh = async () => {
+        const { entries } = parseDictionary(await readCurrentText(file));
+        quickPick.items = [
+            { label: vscode.l10n.t('$(add) Add entry…'), action: 'add' },
+            { label: vscode.l10n.t('$(file-add) Import file…'), action: 'import' },
+            { label: vscode.l10n.t('$(go-to-file) Open dictionary file'), action: 'open' },
+            { label: '', kind: vscode.QuickPickItemKind.Separator },
+            ...entries.map(([source, target]): ManageItem => ({
+                label: source, description: `→ ${target}`, source, buttons: [editButton, deleteButton] })),
+        ];
+    };
+    await refresh();
+
+    quickPick.onDidAccept(() => {
+        const item = quickPick.selectedItems[0];
+        quickPick.hide();
+        if (item?.action === 'add') {void addEntry();}
+        else if (item?.action === 'import') {void importDictionary();}
+        else if (item?.action === 'open') {void editDictionary();}
+        else if (item?.source) {void addEntry(item.source);}
+    });
+    quickPick.onDidTriggerItemButton(async e => {
+        const source = e.item.source;
+        if (!source) {return;}
+        if (e.button === deleteButton) {
+            await writeCurrentText(file, removeEntry(await readCurrentText(file), source));
+            await refresh();
+        } else {
+            quickPick.hide();
+            void addEntry(source);
+        }
+    });
+    quickPick.onDidHide(() => quickPick.dispose());
+    quickPick.show();
 }
 
 export async function registerDictionary(context: vscode.ExtensionContext): Promise<void> {
+    storageDir = path.join(context.globalStorageUri.fsPath, 'dictionaries');
     await reloadDictionary();
 
-    let watchers: vscode.FileSystemWatcher[] = [];
-    const rewatch = () => {
-        watchers.forEach(w => w.dispose());
-        watchers = Object.values(configuredPaths()).map(file => {
-            const w = vscode.workspace.createFileSystemWatcher(
-                new vscode.RelativePattern(vscode.Uri.file(path.dirname(file)), path.basename(file)));
-            const reload = () => { void reloadDictionary(); };
-            w.onDidChange(reload);
-            w.onDidCreate(reload);
-            w.onDidDelete(reload);
-            return w;
-        });
-    };
-    rewatch();
+    const watcher = vscode.workspace.createFileSystemWatcher(
+        new vscode.RelativePattern(vscode.Uri.file(dictionaryDirectory()), '*.txt'));
+    const reload = () => { void reloadDictionary(); };
+    watcher.onDidChange(reload);
+    watcher.onDidCreate(reload);
+    watcher.onDidDelete(reload);
 
     context.subscriptions.push(
-        { dispose: () => watchers.forEach(w => w.dispose()) },
+        watcher,
         changeEmitter,
-        vscode.workspace.onDidChangeConfiguration(e => {
-            if (e.affectsConfiguration('cslediagnostic.customDictionary')) {
-                rewatch();
-                void reloadDictionary();
-            }
-        }),
-        vscode.commands.registerCommand('cslediagnostic.importDictionary', () => importDictionary(context)),
-        vscode.commands.registerCommand('cslediagnostic.openDictionaryTemplate', openTemplate),
+        vscode.commands.registerCommand('cslediagnostic.importDictionary', importDictionary),
+        vscode.commands.registerCommand('cslediagnostic.editDictionary', editDictionary),
+        vscode.commands.registerCommand('cslediagnostic.addDictionaryEntry', addEntry),
+        vscode.commands.registerCommand('cslediagnostic.manageDictionary', manageDictionary),
     );
 }

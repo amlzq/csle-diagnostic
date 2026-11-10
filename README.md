@@ -17,7 +17,7 @@ In the extension settings view, you can modify the Chinese characters glyphs you
 
 ### Custom dictionary
 
-Import a text file with one `source<Tab>target` entry per line in OpenCC dictionary format (`#` starts a comment; extra candidates after the first are ignored). Each file is bound to a conversion target (`*` for all, or `cn`/`twp`/`hk`/`t`); a target-specific file overrides `*` via the `cslediagnostic.customDictionary` setting (an object mapping target to file path) or the **Import Custom Dictionary…** command. Run **Open Custom Dictionary Template** for an example. Custom entries win over the built-in conversion, and mapping a word to itself keeps it unchanged.
+Custom dictionaries use the OpenCC format (`source<Tab>target`, one entry per line, `#` starts a comment; extra candidates after the first are ignored) and are stored in the extension's storage folder, one file per Convert Glyph — `cn.txt`, `twp.txt`, `hk.txt`, `t.txt`. The one matching the current Convert Glyph is used, whatever glyph the source word is written in. Use **Import Custom Dictionary…** to copy a file in, or **Edit Custom Dictionary** to open (and create from a template) the current one. Right-click selected text and choose **Add Custom Dictionary Entry…** (or use the **Add to custom dictionary…** quick fix on a finding) to type the From/To words, and **Manage Custom Dictionary…** to list, edit or delete entries. Custom entries win over the built-in conversion, and mapping a word to itself keeps it unchanged.
 
 ### Supported languages
 

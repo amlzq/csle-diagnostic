@@ -42,3 +42,42 @@ export function parseDictionary(text: string): DictParseResult {
 
     return { entries: [...map], errors };
 }
+
+function lineSource(line: string): string | undefined {
+    const trimmed = line.trim();
+    if (trimmed === '' || trimmed.startsWith('#')) {return undefined;}
+    const tab = line.indexOf('\t');
+    return tab < 0 ? undefined : line.slice(0, tab).trim();
+}
+
+function splitLines(text: string): { lines: string[]; eol: string } {
+    const eol = text.includes('\r\n') ? '\r\n' : '\n';
+    const lines = text.replace(/^\uFEFF/, '').split(/\r?\n/);
+    if (lines[lines.length - 1] === '') {lines.pop();}
+    return { lines, eol };
+}
+
+function joinLines(lines: string[], eol: string): string {
+    return lines.length === 0 ? '' : lines.join(eol) + eol;
+}
+
+/** 在词典文本中新增或替换一个词条，保留注释与其余内容；同名源词只留一条。 */
+export function upsertEntry(text: string, source: string, target: string): string {
+    const { lines, eol } = splitLines(text);
+    const entry = `${source}\t${target}`;
+    let last = -1;
+    lines.forEach((line, i) => { if (lineSource(line) === source) {last = i;} });
+    if (last < 0) {
+        lines.push(entry);
+        last = lines.length - 1;
+    } else {
+        lines[last] = entry;
+    }
+    return joinLines(lines.filter((line, i) => i === last || lineSource(line) !== source), eol);
+}
+
+/** 从词典文本中删除指定源词的所有词条。 */
+export function removeEntry(text: string, source: string): string {
+    const { lines, eol } = splitLines(text);
+    return joinLines(lines.filter(line => lineSource(line) !== source), eol);
+}

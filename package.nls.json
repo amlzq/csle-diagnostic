@@ -32,7 +32,8 @@
   "cslediagnostic.saveAfterApply.desc": "Save the modified files after accepting changes (off by default; changes can be undone while unsaved)",
   "cslediagnostic.autoDiagnosticOnOpen.desc": "Automatically diagnose the whole workspace after opening a project and list the results in the Chinese Expression Diagnostic view. Files are never modified automatically. Large projects may take a while; use workspaceExclude / maxFileSize to limit the scope. Not applied in untrusted workspaces.",
   "cslediagnostic.autoDiagnosticMaxFiles.desc": "Maximum number of files for automatic diagnosis on open; if the workspace has more files, the automatic run is skipped (the manual command is not limited).",
-  "cslediagnostic.customDictionary.desc": "Custom dictionary files in OpenCC format (`source<Tab>target`, `#` for comments), keyed by conversion target: `*` (all), `cn`, `twp`, `hk`, `t`. Entries take priority over built-in conversion; a target-specific file overrides `*`. [Import…](command:cslediagnostic.importDictionary) · [Open template](command:cslediagnostic.openDictionaryTemplate)",
   "cslediagnostic.cmd.importDictionary": "Import Custom Dictionary…",
-  "cslediagnostic.cmd.openDictionaryTemplate": "Open Custom Dictionary Template"
+  "cslediagnostic.cmd.editDictionary": "Edit Custom Dictionary",
+  "cslediagnostic.cmd.addDictionaryEntry": "Add Custom Dictionary Entry…",
+  "cslediagnostic.cmd.manageDictionary": "Manage Custom Dictionary…"
 }

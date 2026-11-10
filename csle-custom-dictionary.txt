@@ -1,0 +1,10 @@
+# Custom phrase dictionary, Quick fix target: Chinese (Taiwan) / 自定义惯用语词典，快速修复目标：Chinese (Taiwan)
+# One entry per line: <source><Tab><target>. 每行一条：原词<Tab>目标词。
+# The target is a single phrase without spaces. 目标词是一个不含空格的词。
+# Lines starting with # are comments; for a repeated source the last entry wins.
+# 以 # 开头的行是注释；原词重复时以最后一条为准。
+# To use an example, delete the leading # (no space after it). 去掉示例行行首的 # 即可使用。
+#
+#程序	程式
+#软件	軟體
+#内存	記憶體

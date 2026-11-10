@@ -137,20 +137,6 @@
           "minimum": 1,
           "scope": "window",
           "description": "%cslediagnostic.autoDiagnosticMaxFiles.desc%"
-        },
-        "cslediagnostic.customDictionary": {
-          "type": "object",
-          "order": 12,
-          "default": {},
-          "additionalProperties": false,
-          "properties": {
-            "*": { "type": "string" },
-            "cn": { "type": "string" },
-            "twp": { "type": "string" },
-            "hk": { "type": "string" },
-            "t": { "type": "string" }
-          },
-          "markdownDescription": "%cslediagnostic.customDictionary.desc%"
         }
       }
     },
@@ -264,9 +250,19 @@
         "title": "%cslediagnostic.cmd.importDictionary%"
       },
       {
-        "command": "cslediagnostic.openDictionaryTemplate",
+        "command": "cslediagnostic.addDictionaryEntry",
         "category": "%cslediagnostic.display.name%",
-        "title": "%cslediagnostic.cmd.openDictionaryTemplate%"
+        "title": "%cslediagnostic.cmd.addDictionaryEntry%"
+      },
+      {
+        "command": "cslediagnostic.manageDictionary",
+        "category": "%cslediagnostic.display.name%",
+        "title": "%cslediagnostic.cmd.manageDictionary%"
+      },
+      {
+        "command": "cslediagnostic.editDictionary",
+        "category": "%cslediagnostic.display.name%",
+        "title": "%cslediagnostic.cmd.editDictionary%"
       },
       {
         "command": "cslediagnostic.diagnosticAllFiles",
@@ -361,6 +357,13 @@
         {
           "command": "cslediagnostic.dismissItem",
           "when": "false"
+        }
+      ],
+      "editor/context": [
+        {
+          "command": "cslediagnostic.addDictionaryEntry",
+          "when": "editorHasSelection",
+          "group": "7_modification@98"
         }
       ],
       "explorer/context": [
