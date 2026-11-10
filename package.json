@@ -1,7 +1,7 @@
 {
   "name": "csle-diagnostic",
   "displayName": "%cslediagnostic.display.name%",
-  "description": "Diagnose whether the string literal expression contains Chinese characters, and can quickly fix them between simplified or traditional glyphs.",
+  "description": "Diagnose whether the string literal expression contains Chinese characters, and can quickly convert them between the usage of different Chinese regions.",
   "version": "0.3.0",
   "icon": "icon.png",
   "publisher": "amlzq",

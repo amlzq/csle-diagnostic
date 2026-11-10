@@ -1,10 +1,10 @@
 Language: English | [简体中文](./README_zh.md)
 
-csle, short for "Chinese String Literal Expression", diagnoses whether the string literal expression contains Chinese characters, and can quickly fix them between simplified or traditional glyphs.
+csle, short for "Chinese String Literal Expression", diagnoses whether the string literal expression contains Chinese characters, and can quickly convert them between the usage of different Chinese regions.
 
 ### Features
 
-- **Diagnose string literals**: finds string literals that contain Chinese characters and quick-fixes them between Simplified and Traditional (Taiwan / Hong Kong / general) glyphs. Documentation comments can optionally be checked too (`checkDocComment`).
+- **Diagnose string literals**: finds string literals that contain Chinese characters and quick-fixes them between the usage of different Chinese regions (Simplified, Taiwan, Hong Kong, general Traditional). Documentation comments can optionally be checked too (`checkDocComment`).
 - **Choose the glyphs**: in the settings, pick the glyph to diagnose (`checkGlyph`) and the glyph to convert to (`convertGlyph`).
 - **Exclude names**: skip strings at certain locations, such as keys, tags, or function calls like `print`. `excludeNames` applies to all languages; `excludeNamesByLanguage` adds names for one language only (pick the language as the item, enter comma-separated names as the value).
 - **Diagnose all files**: scan the whole workspace from the Command Palette (`Chinese Expression Diagnostic: Diagnostic All Files`) or right-click a folder in the Explorer and choose `Diagnostic This Folder`. Results are listed by file in the **Chinese Expression Diagnostic** view, where you can jump to an item, accept or dismiss it, accept a file, or `Accept All`. Files are not saved and changes can be undone. Enable `autoDiagnosticOnOpen` (off by default) to scan when a project opens; nothing is modified automatically. Related settings: `workspaceExclude`, `maxFileSize`, `previewBeforeApply`, `saveAfterApply`, `autoDiagnosticMaxFiles`.
