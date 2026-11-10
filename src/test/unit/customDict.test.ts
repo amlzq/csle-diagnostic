@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 import { ensureOpenCC, createConverter } from '../../utils/opencc.js';
-import { parseDictionary, upsertEntry, removeEntry, validateSource, validateTarget } from '../../utils/customDict.js';
+import { parseDictionary, upsertEntry, removeEntry, validateSource, validateTarget, renderTemplate } from '../../utils/customDict.js';
 
 suite('自定义词典', function () {
     suite('parseDictionary', () => {
@@ -46,6 +46,14 @@ suite('自定义词典', function () {
 
         test('removeEntry 源词不存在时内容不变', () => {
             assert.strictEqual(removeEntry('软件\tA\n', '网络'), '软件\tA\n');
+        });
+    });
+
+    suite('模板渲染', () => {
+        test('按字形替换英文与中文目标名', () => {
+            const t = 'Target: {target} / 目标：{目标}\n';
+            assert.strictEqual(renderTemplate(t, 'hk'), 'Target: Chinese (Hong Kong) / 目标：中文（香港）\n');
+            assert.strictEqual(renderTemplate(t, 'cn'), 'Target: Simplified Chinese / 目标：简体中文\n');
         });
     });
 

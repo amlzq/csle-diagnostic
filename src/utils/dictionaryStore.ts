@@ -1,7 +1,7 @@
 import * as vscode from 'vscode';
 import * as fs from 'fs/promises';
 import * as path from 'path';
-import { DictEntry, DictValidation, parseDictionary, removeEntry, upsertEntry, validateSource, validateTarget } from './customDict';
+import { DictEntry, DictValidation, parseDictionary, renderTemplate, removeEntry, upsertEntry, validateSource, validateTarget } from './customDict';
 import { openDictionaryPanel } from '../view/dictionaryPanel';
 import { getUserConfig } from './config';
 import { toLocale } from './utils';
@@ -9,16 +9,8 @@ import { toLocale } from './utils';
 /** 词典按「转换字形」分文件：目录下为 cn.txt / twp.txt / hk.txt / t.txt，与源词字形无关。 */
 const LOCALES = ['cn', 'twp', 'hk', 't'] as const;
 
-export const DICTIONARY_TEMPLATE = [
-    '# 自定义词典 / Custom dictionary (OpenCC format)',
-    '# 一行一条：源词<Tab>目标词1 目标词2（有多个候选时取第一个）；# 开头为注释。',
-    '# 源词可以是任意字形的写法，命中即转换为目标词；目标词与源词相同表示固定该词、不做转换。',
-    '服务器\t伺服器',
-    '软件\t軟體',
-    '',
-].join('\n');
-
 let storageDir = '';
+let extensionUri: vscode.Uri | undefined;
 const entriesByLocale = new Map<string, ReadonlyArray<DictEntry>>();
 const changeEmitter = new vscode.EventEmitter<void>();
 
@@ -73,7 +65,7 @@ function currentConvertLocale(): string {
 }
 
 /** 选择词典文件，校验后复制为当前「转换字形」对应的词典。 */
-async function importDictionary(): Promise<void> {
+async function importDictionary(locale: string = currentConvertLocale()): Promise<void> {
     const picked = await vscode.window.showOpenDialog({
         canSelectMany: false,
         filters: { [vscode.l10n.t('Dictionary')]: ['txt', 'tsv'] },
@@ -93,7 +85,7 @@ async function importDictionary(): Promise<void> {
         return;
     }
 
-    const target = dictionaryFile(currentConvertLocale());
+    const target = dictionaryFile(locale);
     const exists = await fs.access(target).then(() => true, () => false);
     if (exists) {
         const overwrite = vscode.l10n.t('Overwrite');
@@ -110,11 +102,19 @@ async function importDictionary(): Promise<void> {
         : vscode.l10n.t('Imported {0} entries.', entries.length));
 }
 
+/** 随扩展发布的模板（resources/csle-custom-dictionary.txt）；读不到时返回空文本；`{target}`/`{目标}` 按字形替换。 */
+async function loadTemplate(locale: string): Promise<string> {
+    if (!extensionUri) {return '';}
+    const text = await fs.readFile(path.join(extensionUri.fsPath, 'resources', 'csle-custom-dictionary.txt'), 'utf8')
+        .catch(() => '');
+    return renderTemplate(text, locale);
+}
+
 /** 打开当前「转换字形」对应的词典，不存在则用模板创建。 */
-async function editDictionary(): Promise<void> {
-    const file = dictionaryFile(currentConvertLocale());
+async function editDictionary(locale: string = currentConvertLocale()): Promise<void> {
+    const file = dictionaryFile(locale);
     await fs.mkdir(path.dirname(file), { recursive: true });
-    await fs.writeFile(file, DICTIONARY_TEMPLATE, { encoding: 'utf8', flag: 'wx' }).catch(e => {
+    await fs.writeFile(file, await loadTemplate(locale), { encoding: 'utf8', flag: 'wx' }).catch(e => {
         if ((e as NodeJS.ErrnoException).code !== 'EEXIST') {throw e;}
     });
     await vscode.window.showTextDocument(await vscode.workspace.openTextDocument(vscode.Uri.file(file)));
@@ -140,20 +140,20 @@ function validationMessage(code: DictValidation | undefined): string | undefined
 }
 
 /** 面板保存词条：校验后写入当前词典；`oldSource` 与 `source` 不同视为改名。 */
-async function saveEntry(oldSource: string | undefined, source: string, target: string): Promise<string | undefined> {
+async function saveEntry(locale: string, oldSource: string | undefined, source: string, target: string): Promise<string | undefined> {
     const from = source.trim();
     const to = target.trim();
     const error = validationMessage(validateSource(from)) ?? validationMessage(validateTarget(to));
     if (error) {return error;}
-    const file = dictionaryFile(currentConvertLocale());
+    const file = dictionaryFile(locale);
     let text = await readCurrentText(file);
     if (oldSource !== undefined && oldSource !== from) {text = removeEntry(text, oldSource);}
     await writeCurrentText(file, upsertEntry(text, from, to));
     return undefined;
 }
 
-async function deleteEntry(source: string): Promise<void> {
-    const file = dictionaryFile(currentConvertLocale());
+async function deleteEntry(locale: string, source: string): Promise<void> {
+    const file = dictionaryFile(locale);
     await writeCurrentText(file, removeEntry(await readCurrentText(file), source));
 }
 
@@ -198,26 +198,84 @@ async function addEntry(initialSource?: unknown): Promise<boolean> {
     return true;
 }
 
+function localeLabel(locale: string): string {
+    switch (locale) {
+        case 'cn': return vscode.l10n.t('Simplified Chinese');
+        case 'twp': return vscode.l10n.t('Chinese (Taiwan)');
+        case 'hk': return vscode.l10n.t('Chinese (Hong Kong)');
+        default: return vscode.l10n.t('Traditional Chinese');
+    }
+}
+
+/** 导出：把指定字形的词典另存为文件。 */
+async function exportDictionary(locale: string): Promise<void> {
+    const text = await readCurrentText(dictionaryFile(locale));
+    const count = parseDictionary(text).entries.length;
+    if (count === 0) {
+        void vscode.window.showInformationMessage(vscode.l10n.t('No entries to export.'));
+        return;
+    }
+    const uri = await vscode.window.showSaveDialog({
+        defaultUri: vscode.Uri.file(path.join(dictionaryDirectory(), `csle-custom-dictionary-${locale}.txt`)),
+        filters: { [vscode.l10n.t('Dictionary')]: ['txt'] },
+    });
+    if (!uri) {return;}
+    await fs.writeFile(uri.fsPath, text, 'utf8');
+    void vscode.window.showInformationMessage(vscode.l10n.t('Exported {0} entries.', count));
+}
+
+/** 下载模板：把随扩展发布的模板文件另存到用户选择的位置。 */
+async function downloadTemplate(locale: string): Promise<void> {
+    const text = await loadTemplate(locale);
+    if (text === '') {
+        void vscode.window.showErrorMessage(vscode.l10n.t('Template file not found.'));
+        return;
+    }
+    const uri = await vscode.window.showSaveDialog({
+        defaultUri: vscode.Uri.file(path.join(
+            vscode.workspace.workspaceFolders?.[0]?.uri.fsPath ?? dictionaryDirectory(), 'csle-custom-dictionary.txt')),
+        filters: { [vscode.l10n.t('Dictionary')]: ['txt'] },
+    });
+    if (!uri) {return;}
+    await fs.writeFile(uri.fsPath, text, 'utf8');
+    void vscode.window.showInformationMessage(vscode.l10n.t('Template saved to {0}', uri.fsPath));
+}
+
+/** 清空：确认后删除指定字形词典中的全部词条（文件保留为空）。 */
+async function clearDictionary(locale: string): Promise<void> {
+    const file = dictionaryFile(locale);
+    const count = parseDictionary(await readCurrentText(file)).entries.length;
+    if (count === 0) {return;}
+    const clear = vscode.l10n.t('Clear');
+    const answer = await vscode.window.showWarningMessage(
+        vscode.l10n.t('Clear all {0} entries of {1}? This cannot be undone.', count, localeLabel(locale)),
+        { modal: true }, clear);
+    if (answer !== clear) {return;}
+    await writeCurrentText(file, '');
+}
+
 /** 打开词典管理面板。 */
 function manageDictionary(): void {
     openDictionaryPanel({
-        async getState() {
-            const file = dictionaryFile(currentConvertLocale());
-            return {
-                glyph: getUserConfig().convertGlyph,
-                file,
-                entries: parseDictionary(await readCurrentText(file)).entries,
-            };
+        locales: LOCALES.map(value => ({ value, label: localeLabel(value) })),
+        initialLocale: currentConvertLocale(),
+        async getState(locale) {
+            const file = dictionaryFile(locale);
+            return { file, entries: parseDictionary(await readCurrentText(file)).entries };
         },
         save: saveEntry,
         remove: deleteEntry,
         importFile: importDictionary,
         openFile: editDictionary,
+        exportFile: exportDictionary,
+        downloadTemplate,
+        clear: clearDictionary,
         onDidChange: onDidChangeDictionary,
     });
 }
 
 export async function registerDictionary(context: vscode.ExtensionContext): Promise<void> {
+    extensionUri = context.extensionUri;
     storageDir = path.join(context.globalStorageUri.fsPath, 'dictionaries');
     await reloadDictionary();
 
@@ -242,8 +300,8 @@ export async function registerDictionary(context: vscode.ExtensionContext): Prom
                 void reloadDictionary();
             }
         }),
-        vscode.commands.registerCommand('cslediagnostic.importDictionary', importDictionary),
-        vscode.commands.registerCommand('cslediagnostic.editDictionary', editDictionary),
+        vscode.commands.registerCommand('cslediagnostic.importDictionary', () => importDictionary()),
+        vscode.commands.registerCommand('cslediagnostic.editDictionary', () => editDictionary()),
         vscode.commands.registerCommand('cslediagnostic.addDictionaryEntry', addEntry),
         vscode.commands.registerCommand('cslediagnostic.manageDictionary', manageDictionary),
     );

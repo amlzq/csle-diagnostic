@@ -43,12 +43,20 @@
   "Delete": "刪除",
   "Add to custom dictionary…": "加入自訂詞典…",
   "Custom Dictionary": "自訂詞典",
-  "Convert Glyph: {0}": "轉換字形：{0}",
   "Search": "搜尋",
   "Import…": "匯入…",
   "Open file": "開啟檔案",
   "From (source word, any glyph)": "From（來源詞，任意字形）",
   "To (replacement)": "To（取代詞）",
   "Add": "新增",
-  "No entries": "尚無詞條"
+  "No entries": "尚無詞條",
+  "Glyph": "字形",
+  "Export…": "匯出…",
+  "Download template": "下載範本",
+  "Clear": "清空",
+  "No entries to export.": "沒有可匯出的詞條。",
+  "Exported {0} entries.": "已匯出 {0} 個詞條。",
+  "Template saved to {0}": "範本已儲存到 {0}",
+  "Clear all {0} entries of {1}? This cannot be undone.": "確定清空{1}的全部 {0} 個詞條？此操作無法復原。",
+  "Template file not found.": "找不到範本檔案。"
 }

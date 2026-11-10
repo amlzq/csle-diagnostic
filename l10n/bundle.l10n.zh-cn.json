@@ -43,12 +43,20 @@
   "Delete": "删除",
   "Add to custom dictionary…": "添加到自定义词典…",
   "Custom Dictionary": "自定义词典",
-  "Convert Glyph: {0}": "转换字形：{0}",
   "Search": "搜索",
   "Import…": "导入…",
   "Open file": "打开文件",
   "From (source word, any glyph)": "From（源词，任意字形）",
   "To (replacement)": "To（替换词）",
   "Add": "添加",
-  "No entries": "暂无词条"
+  "No entries": "暂无词条",
+  "Glyph": "字形",
+  "Export…": "导出…",
+  "Download template": "下载模板",
+  "Clear": "清空",
+  "No entries to export.": "没有可导出的词条。",
+  "Exported {0} entries.": "已导出 {0} 个词条。",
+  "Template saved to {0}": "模板已保存到 {0}",
+  "Clear all {0} entries of {1}? This cannot be undone.": "确定清空{1}的全部 {0} 个词条？此操作无法撤销。",
+  "Template file not found.": "未找到模板文件。"
 }

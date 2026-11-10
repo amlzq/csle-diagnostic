@@ -95,3 +95,16 @@ export function validateTarget(value: string): DictValidation | undefined {
     if (value.trim() === '') {return 'empty';}
     return /\s/.test(value.trim()) ? 'whitespace' : undefined;
 }
+
+const TARGET_NAMES: Record<string, [en: string, zh: string]> = {
+    cn: ['Simplified Chinese', '简体中文'],
+    twp: ['Chinese (Taiwan)', '中文（台湾）'],
+    hk: ['Chinese (Hong Kong)', '中文（香港）'],
+    t: ['Traditional Chinese', '繁体中文'],
+};
+
+/** 把模板里的 `{target}`（英文名）与 `{目标}`（中文名）替换为指定转换字形的名称。 */
+export function renderTemplate(template: string, locale: string): string {
+    const [en, zh] = TARGET_NAMES[locale] ?? TARGET_NAMES.t;
+    return template.replace(/\{target\}/g, en).replace(/\{目标\}/g, zh);
+}

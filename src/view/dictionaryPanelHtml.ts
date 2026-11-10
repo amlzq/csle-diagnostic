@@ -13,8 +13,10 @@ export function buildPanelHtml(nonce: string, cspSource: string): string {
 body { font-family: var(--vscode-font-family); font-size: var(--vscode-font-size); color: var(--vscode-foreground); padding: 16px 24px; }
 h2 { margin: 0 0 4px; font-weight: 600; }
 .muted { color: var(--vscode-descriptionForeground); word-break: break-all; margin-bottom: 12px; }
-.toolbar { display: flex; gap: 8px; margin-bottom: 12px; }
-.toolbar input { flex: 1; }
+.toolbar { display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; align-items: center; }
+.toolbar input { flex: 1; min-width: 140px; }
+select { padding: 4px 6px; color: var(--vscode-dropdown-foreground); background: var(--vscode-dropdown-background); border: 1px solid var(--vscode-dropdown-border, transparent); }
+button.danger { color: var(--vscode-errorForeground); }
 table { width: 100%; border-collapse: collapse; table-layout: fixed; }
 th { text-align: left; padding: 4px 6px; color: var(--vscode-descriptionForeground); font-weight: 600; }
 td { padding: 3px 6px; }
@@ -34,9 +36,14 @@ tfoot td { padding-top: 10px; }
 <h2 id="title"></h2>
 <div class="muted" id="file"></div>
 <div class="toolbar">
+  <label for="locale" id="glyphLabel"></label>
+  <select id="locale"></select>
   <input id="search" type="text">
   <button id="import"></button>
+  <button id="export"></button>
+  <button id="template"></button>
   <button id="open"></button>
+  <button id="clear" class="danger"></button>
 </div>
 <table>
   <thead><tr><th id="thFrom"></th><th id="thTo"></th><th class="action"></th></tr></thead>
@@ -61,7 +68,22 @@ tfoot td { padding-top: 10px; }
     if (!state) { return; }
     const L = state.labels;
     $('title').textContent = L.title;
-    $('file').textContent = L.glyph + ' · ' + state.file;
+    $('file').textContent = state.file;
+    $('glyphLabel').textContent = L.glyph;
+    const select = $('locale');
+    if (select.options.length !== state.locales.length) {
+      select.textContent = '';
+      for (const item of state.locales) {
+        const option = document.createElement('option');
+        option.value = item.value;
+        option.textContent = item.label;
+        select.appendChild(option);
+      }
+    }
+    select.value = state.locale;
+    $('export').textContent = L.export;
+    $('template').textContent = L.template;
+    $('clear').textContent = L.clear;
     $('search').placeholder = L.search;
     $('import').textContent = L.import;
     $('open').textContent = L.openFile;
@@ -119,6 +141,10 @@ tfoot td { padding-top: 10px; }
   $('search').addEventListener('input', render);
   $('import').addEventListener('click', () => post({ type: 'import' }));
   $('open').addEventListener('click', () => post({ type: 'openFile' }));
+  $('export').addEventListener('click', () => post({ type: 'export' }));
+  $('template').addEventListener('click', () => post({ type: 'template' }));
+  $('clear').addEventListener('click', () => post({ type: 'clear' }));
+  $('locale').addEventListener('change', () => { $('search').value = ''; post({ type: 'setLocale', locale: $('locale').value }); });
 
   window.addEventListener('message', event => {
     const message = event.data;
