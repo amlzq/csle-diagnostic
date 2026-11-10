@@ -93,7 +93,26 @@
             "type": "string"
           },
           "default": [],
-          "description": "%cslediagnostic.excludeNames.desc%"
+          "markdownDescription": "%cslediagnostic.excludeNames.desc%"
+        },
+        "cslediagnostic.excludeNamesByLanguage": {
+          "type": "object",
+          "order": 5.5,
+          "properties": {
+            "dart": { "type": "string" },
+            "javascript": { "type": "string" },
+            "typescript": { "type": "string" },
+            "javascriptreact": { "type": "string" },
+            "typescriptreact": { "type": "string" },
+            "html": { "type": "string" },
+            "css": { "type": "string" },
+            "json": { "type": "string" },
+            "php": { "type": "string" },
+            "python": { "type": "string" }
+          },
+          "additionalProperties": false,
+          "default": {},
+          "markdownDescription": "%cslediagnostic.excludeNamesByLanguage.desc%"
         },
         "cslediagnostic.workspaceExclude": {
           "type": "array",

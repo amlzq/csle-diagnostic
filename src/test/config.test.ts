@@ -50,6 +50,24 @@ suite('配置诊断测试', function () {
         });
     });
 
+    test('excludeNamesByLanguage 仅对指定语言生效', async () => {
+        await withConfig({ excludeNamesByLanguage: { typescript: 'foo, i18n.t' } }, async () => {
+            const ts = await vscode.workspace.openTextDocument({
+                language: 'typescript',
+                content: "foo('简体测试');\n",
+            });
+            await vscode.window.showTextDocument(ts);
+            assert.strictEqual((await waitForDiagnosticsCount(ts.uri, 0)).length, 0);
+
+            const py = await vscode.workspace.openTextDocument({
+                language: 'python',
+                content: "foo('简体测试')\n",
+            });
+            await vscode.window.showTextDocument(py);
+            assert.strictEqual((await waitForDiagnosticsCount(py.uri, 1)).length, 1);
+        });
+    });
+
     test('excludeNames 应支持点号方法名', async () => {
         await withConfig({ excludeNames: ['i18n.t'] }, async () => {
             const doc = await vscode.workspace.openTextDocument({
