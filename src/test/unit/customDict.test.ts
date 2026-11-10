@@ -90,6 +90,14 @@ suite('自定义词典', function () {
             assert.strictEqual(c('网络'), 'WL');
         });
 
+        test('同一词条数组重复创建转换器结果一致，且复用基础转换器', () => {
+            const entries: Array<[string, string]> = [['网络', '網絡']];
+            const a = createConverter('cn', 'twp', entries);
+            const b = createConverter('cn', 'twp', entries);
+            assert.strictEqual(a('网络软件'), b('网络软件'));
+            assert.strictEqual(createConverter('cn', 'twp'), createConverter('cn', 'twp'));
+        });
+
         test('无词条时与原转换器一致', () => {
             assert.strictEqual(createConverter('cn', 'twp', [])('软件网络'), createConverter('cn', 'twp')('软件网络'));
         });

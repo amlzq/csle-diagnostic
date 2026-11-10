@@ -12,13 +12,19 @@ const LOCALES = ['cn', 'twp', 'hk', 't'] as const;
 let storageDir = '';
 let extensionUri: vscode.Uri | undefined;
 const entriesByLocale = new Map<string, ReadonlyArray<DictEntry>>();
+/** 各字形词典文件上次读到的原文，用于跳过内容未变的重复重载（避免重复警告与重复诊断）。 */
+const textByLocale = new Map<string, string>();
+const NO_ENTRIES: ReadonlyArray<DictEntry> = [];
 const changeEmitter = new vscode.EventEmitter<void>();
 
 export const onDidChangeDictionary = changeEmitter.event;
 
-/** 返回转换到字形 `to`（cn / twp / hk / t）时生效的词条。 */
-export function getCustomEntries(to: string): Array<[string, string]> {
-    return [...(entriesByLocale.get(to) ?? [])];
+/**
+ * 返回转换到字形 `to`（cn / twp / hk / t）时生效的词条。词典未变化时返回同一个数组，
+ * 供 createConverter 以数组引用缓存匹配树。
+ */
+export function getCustomEntries(to: string): ReadonlyArray<DictEntry> {
+    return entriesByLocale.get(to) ?? NO_ENTRIES;
 }
 
 /** 词典目录：设置值（支持 `${workspaceFolder}`，相对路径按首个工作区文件夹解析），留空用扩展存储目录。 */
@@ -35,20 +41,30 @@ function dictionaryFile(locale: string): string {
     return path.join(dictionaryDirectory(), `${locale}.txt`);
 }
 
-/** 读取并解析目录下的词典文件；文件缺失视为没有词条，格式错误时只弹警告。 */
+/**
+ * 读取并解析目录下的词典文件；文件缺失视为没有词条，格式错误时只弹警告。
+ * 文件内容与上次相同则跳过，全部未变时不触发变更事件。
+ */
 export async function reloadDictionary(): Promise<void> {
-    entriesByLocale.clear();
+    let changed = false;
     for (const locale of LOCALES) {
         const file = dictionaryFile(locale);
-        let text: string;
+        let text: string | undefined;
         try {
             text = await fs.readFile(file, 'utf8');
         } catch (e) {
             if ((e as NodeJS.ErrnoException).code !== 'ENOENT') {
                 void vscode.window.showWarningMessage(vscode.l10n.t('Cannot read custom dictionary: {0}', file));
             }
+        }
+        if (textByLocale.get(locale) === text) {continue;}
+        changed = true;
+        if (text === undefined) {
+            textByLocale.delete(locale);
+            entriesByLocale.delete(locale);
             continue;
         }
+        textByLocale.set(locale, text);
         const { entries, errors } = parseDictionary(text);
         entriesByLocale.set(locale, entries);
         if (errors.length > 0) {
@@ -57,7 +73,7 @@ export async function reloadDictionary(): Promise<void> {
                 file, errors.length, errors[0].line));
         }
     }
-    changeEmitter.fire();
+    if (changed) {changeEmitter.fire();}
 }
 
 function currentConvertLocale(): string {
@@ -296,6 +312,7 @@ export async function registerDictionary(context: vscode.ExtensionContext): Prom
         changeEmitter,
         vscode.workspace.onDidChangeConfiguration(e => {
             if (e.affectsConfiguration('cslediagnostic.customDictionaryDirectory')) {
+                textByLocale.clear();
                 rewatch();
                 void reloadDictionary();
             }

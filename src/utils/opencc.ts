@@ -31,33 +31,48 @@ export async function ensureOpenCC(): Promise<void> {
  * 不能直接把用户词典塞进 ConverterFactory：放在后面时 key 须是转换后的形态，
  * 放在前面则其输出会被后续阶段再次转换。
  */
+const baseConverters = new Map<string, ConverterFunction>();
+// 以词条数组引用为键：词典未变化时 getCustomEntries 返回同一个数组，匹配树只需构建一次。
+const customTries = new WeakMap<ReadonlyArray<unknown>, TrieLike>();
+
 export function createConverter(
     from: Locale,
     to: Locale,
-    customEntries: ReadonlyArray<[string, string]> = []
+    customEntries: ReadonlyArray<readonly [string, string]> = []
 ): ConverterFunction {
     if (openccModule === null) {
         throw new Error('opencc-js is not initialized. Call ensureOpenCC() during extension activation.');
     }
-    const base = openccModule.Converter({ from, to });
+    const baseKey = `${from}>${to}`;
+    let base = baseConverters.get(baseKey);
+    if (!base) {
+        base = openccModule.Converter({ from, to });
+        baseConverters.set(baseKey, base);
+    }
     if (customEntries.length === 0) {
         return base;
     }
-    const trie = new openccModule.Trie();
-    trie.loadDict(customEntries.map(([k, v]) => [k, v]));
+    let trie = customTries.get(customEntries);
+    if (!trie) {
+        trie = new openccModule.Trie();
+        trie.loadDict(customEntries.map(([k, v]) => [k, v]));
+        customTries.set(customEntries, trie);
+    }
+    const converter = base;
+    const matcher = trie;
     return (text: string): string => {
         let out = '';
         let pending = 0; // 尚未转换的原文片段起点
         let i = 0;
         while (i < text.length) {
-            const m = trie.matchPrefix(text, i);
+            const m = matcher.matchPrefix(text, i);
             if (m) {
-                out += base(text.slice(pending, i)) + m.value;
+                out += converter(text.slice(pending, i)) + m.value;
                 i = pending = m.end;
             } else {
                 i += text.codePointAt(i)! > 0xffff ? 2 : 1;
             }
         }
-        return out + base(text.slice(pending));
+        return out + converter(text.slice(pending));
     };
 }
