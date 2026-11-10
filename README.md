@@ -2,22 +2,13 @@ Language: English | [简体中文](./README_zh.md)
 
 csle, short for "Chinese String Literal Expression", diagnoses whether the string literal expression contains Chinese characters, and can quickly fix them between simplified or traditional glyphs.
 
-In the extension settings view, you can exclude strings in certain locations, such as print, if you don't want to diagnose them.
+### Features
 
-In the extension settings view, you can modify the Chinese characters glyphs you want to diagnose and the glyphs to quickly fix.
-
-### Diagnose all files
-
-- Command Palette: run `Chinese Expression Diagnostic: Diagnostic All Files` to scan the workspace.
-- Explorer: right-click folders and choose `Diagnostic This Folder`.
-- Results are listed by file in the **Chinese Expression Diagnostic** view; click an item to jump to it.
-- Accept or dismiss one item, accept a file, or `Accept All`. Files are not saved and changes can be undone.
-- Automatic diagnosis: enable `autoDiagnosticOnOpen` (off by default) to scan when a project opens. Nothing is modified automatically.
-- Related settings: `workspaceExclude`, `maxFileSize`, `previewBeforeApply`, `saveAfterApply`, `autoDiagnosticOnOpen`, `autoDiagnosticMaxFiles`.
-
-### Custom dictionary
-
-Custom dictionaries use the OpenCC format (`source<Tab>target`, one entry per line, `#` starts a comment; extra candidates after the first are ignored) and are stored one file per Convert Glyph — `cn.txt`, `twp.txt`, `hk.txt`, `t.txt` — in the extension's storage folder by default, or in the folder set by `cslediagnostic.customDictionaryDirectory`. Point that setting at a folder in your repository (workspace settings; `${workspaceFolder}` or a relative path) to share one dictionary with your team. The one matching the current Convert Glyph is used, whatever glyph the source word is written in. Use **Import Custom Dictionary…** to copy a file in, or **Edit Custom Dictionary** to open (and create from a template) the current one. Right-click selected text and choose **Add Custom Dictionary Entry…** (or use the **Add to custom dictionary…** quick fix on a finding) to type the From/To words, and **Manage Custom Dictionary…** to open a panel where you can search, add, edit (From/To input boxes), delete, import and open the dictionary of any glyph (picked from the panel's own dropdown, independent of the settings), export it, download the template, or clear it. Custom entries win over the built-in conversion, and mapping a word to itself keeps it unchanged.
+- **Diagnose string literals**: finds string literals that contain Chinese characters and quick-fixes them between Simplified and Traditional (Taiwan / Hong Kong / general) glyphs. Documentation comments can optionally be checked too (`checkDocComment`).
+- **Choose the glyphs**: in the settings, pick the glyph to diagnose (`checkGlyph`) and the glyph to convert to (`convertGlyph`).
+- **Exclude names**: skip strings at certain locations, such as keys, tags, or function calls like `print`. `excludeNames` applies to all languages; `excludeNamesByLanguage` adds names for one language only (pick the language as the item, enter comma-separated names as the value).
+- **Diagnose all files**: scan the whole workspace from the Command Palette (`Chinese Expression Diagnostic: Diagnostic All Files`) or right-click a folder in the Explorer and choose `Diagnostic This Folder`. Results are listed by file in the **Chinese Expression Diagnostic** view, where you can jump to an item, accept or dismiss it, accept a file, or `Accept All`. Files are not saved and changes can be undone. Enable `autoDiagnosticOnOpen` (off by default) to scan when a project opens; nothing is modified automatically. Related settings: `workspaceExclude`, `maxFileSize`, `previewBeforeApply`, `saveAfterApply`, `autoDiagnosticMaxFiles`.
+- **Custom dictionary**: override the built-in conversion with your own word mappings. Dictionaries use the OpenCC format (`source<Tab>target`, one entry per line, `#` starts a comment) and are kept one file per Convert Glyph (`cn.txt`, `twp.txt`, `hk.txt`, `t.txt`). Set `customDictionaryDirectory` to a folder in your repository (`${workspaceFolder}` or a relative path) to share one dictionary with your team. Add entries from the right-click menu (**Add Custom Dictionary Entry…**) or the **Add to custom dictionary…** quick fix, and use **Manage Custom Dictionary…** to search, edit, delete, import, export, or clear entries for any glyph. Custom entries win over the built-in conversion, and mapping a word to itself keeps it unchanged.
 
 ### Supported languages
 
