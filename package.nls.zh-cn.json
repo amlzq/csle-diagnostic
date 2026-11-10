@@ -35,5 +35,6 @@
   "cslediagnostic.cmd.importDictionary": "导入自定义词典…",
   "cslediagnostic.cmd.editDictionary": "编辑自定义词典",
   "cslediagnostic.cmd.addDictionaryEntry": "添加自定义词典词条…",
-  "cslediagnostic.cmd.manageDictionary": "管理自定义词典…"
+  "cslediagnostic.cmd.manageDictionary": "管理自定义词典…",
+  "cslediagnostic.customDictionaryDirectory.desc": "存放自定义词典（`cn.txt`、`twp.txt`、`hk.txt`、`t.txt`，OpenCC 格式）的目录。在工作区设置中指向仓库内的文件夹（如 `${workspaceFolder}/.csle` 或相对路径），团队即可共用同一份词典。留空则使用扩展存储目录。[管理…](command:cslediagnostic.manageDictionary) · [添加词条…](command:cslediagnostic.addDictionaryEntry) · [导入…](command:cslediagnostic.importDictionary)"
 }

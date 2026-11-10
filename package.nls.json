@@ -35,5 +35,6 @@
   "cslediagnostic.cmd.importDictionary": "Import Custom Dictionary…",
   "cslediagnostic.cmd.editDictionary": "Edit Custom Dictionary",
   "cslediagnostic.cmd.addDictionaryEntry": "Add Custom Dictionary Entry…",
-  "cslediagnostic.cmd.manageDictionary": "Manage Custom Dictionary…"
+  "cslediagnostic.cmd.manageDictionary": "Manage Custom Dictionary…",
+  "cslediagnostic.customDictionaryDirectory.desc": "Directory holding the custom dictionaries (`cn.txt`, `twp.txt`, `hk.txt`, `t.txt`, OpenCC format). Set it in workspace settings to a folder in the repository (e.g. `${workspaceFolder}/.csle` or a relative path) so the team shares one dictionary. Empty means the extension's storage folder. [Manage…](command:cslediagnostic.manageDictionary) · [Add entry…](command:cslediagnostic.addDictionaryEntry) · [Import…](command:cslediagnostic.importDictionary)"
 }

@@ -28,8 +28,14 @@ export function getCustomEntries(to: string): Array<[string, string]> {
     return [...(entriesByLocale.get(to) ?? [])];
 }
 
+/** 词典目录：设置值（支持 `${workspaceFolder}`，相对路径按首个工作区文件夹解析），留空用扩展存储目录。 */
 function dictionaryDirectory(): string {
-    return storageDir;
+    const raw = vscode.workspace.getConfiguration('cslediagnostic')
+        .get<string>('customDictionaryDirectory', '').trim();
+    if (raw === '') {return storageDir;}
+    const folder = vscode.workspace.workspaceFolders?.[0]?.uri.fsPath ?? '';
+    const expanded = raw.replace(/\$\{workspaceFolder\}/g, folder);
+    return path.isAbsolute(expanded) ? expanded : path.resolve(folder, expanded);
 }
 
 function dictionaryFile(locale: string): string {
@@ -223,16 +229,27 @@ export async function registerDictionary(context: vscode.ExtensionContext): Prom
     storageDir = path.join(context.globalStorageUri.fsPath, 'dictionaries');
     await reloadDictionary();
 
-    const watcher = vscode.workspace.createFileSystemWatcher(
-        new vscode.RelativePattern(vscode.Uri.file(dictionaryDirectory()), '*.txt'));
-    const reload = () => { void reloadDictionary(); };
-    watcher.onDidChange(reload);
-    watcher.onDidCreate(reload);
-    watcher.onDidDelete(reload);
+    let watcher: vscode.FileSystemWatcher | undefined;
+    const rewatch = () => {
+        watcher?.dispose();
+        watcher = vscode.workspace.createFileSystemWatcher(
+            new vscode.RelativePattern(vscode.Uri.file(dictionaryDirectory()), '*.txt'));
+        const reload = () => { void reloadDictionary(); };
+        watcher.onDidChange(reload);
+        watcher.onDidCreate(reload);
+        watcher.onDidDelete(reload);
+    };
+    rewatch();
 
     context.subscriptions.push(
-        watcher,
+        { dispose: () => watcher?.dispose() },
         changeEmitter,
+        vscode.workspace.onDidChangeConfiguration(e => {
+            if (e.affectsConfiguration('cslediagnostic.customDictionaryDirectory')) {
+                rewatch();
+                void reloadDictionary();
+            }
+        }),
         vscode.commands.registerCommand('cslediagnostic.importDictionary', importDictionary),
         vscode.commands.registerCommand('cslediagnostic.editDictionary', editDictionary),
         vscode.commands.registerCommand('cslediagnostic.addDictionaryEntry', addEntry),

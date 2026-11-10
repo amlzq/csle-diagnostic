@@ -137,6 +137,12 @@
           "minimum": 1,
           "scope": "window",
           "description": "%cslediagnostic.autoDiagnosticMaxFiles.desc%"
+        },
+        "cslediagnostic.customDictionaryDirectory": {
+          "type": "string",
+          "order": 12,
+          "default": "",
+          "markdownDescription": "%cslediagnostic.customDictionaryDirectory.desc%"
         }
       }
     },
