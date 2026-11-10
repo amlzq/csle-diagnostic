@@ -40,11 +40,15 @@
   "Must not contain tabs": "不能包含制表符",
   "Must not contain whitespace": "不能包含空白字符",
   "Saved: {0} → {1}": "已保存：{0} → {1}",
-  "Edit": "编辑",
   "Delete": "删除",
-  "Custom Dictionary ({0})": "自定义词典（{0}）",
-  "$(add) Add entry…": "$(add) 添加词条…",
-  "$(file-add) Import file…": "$(file-add) 导入文件…",
-  "$(go-to-file) Open dictionary file": "$(go-to-file) 打开词典文件",
-  "Add to custom dictionary…": "添加到自定义词典…"
+  "Add to custom dictionary…": "添加到自定义词典…",
+  "Custom Dictionary": "自定义词典",
+  "Convert Glyph: {0}": "转换字形：{0}",
+  "Search": "搜索",
+  "Import…": "导入…",
+  "Open file": "打开文件",
+  "From (source word, any glyph)": "From（源词，任意字形）",
+  "To (replacement)": "To（替换词）",
+  "Add": "添加",
+  "No entries": "暂无词条"
 }

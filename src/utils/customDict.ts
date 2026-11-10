@@ -81,3 +81,17 @@ export function removeEntry(text: string, source: string): string {
     const { lines, eol } = splitLines(text);
     return joinLines(lines.filter(line => lineSource(line) !== source), eol);
 }
+
+export type DictValidation = 'empty' | 'tab' | 'whitespace';
+
+/** 校验 From（源词）：不能为空，不能含制表符。 */
+export function validateSource(value: string): DictValidation | undefined {
+    if (value.trim() === '') {return 'empty';}
+    return /\t/.test(value) ? 'tab' : undefined;
+}
+
+/** 校验 To（目标词）：不能为空，不能含空白（OpenCC 以空白分隔多个候选）。 */
+export function validateTarget(value: string): DictValidation | undefined {
+    if (value.trim() === '') {return 'empty';}
+    return /\s/.test(value.trim()) ? 'whitespace' : undefined;
+}

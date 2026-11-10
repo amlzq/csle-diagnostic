@@ -1,7 +1,8 @@
 import * as vscode from 'vscode';
 import * as fs from 'fs/promises';
 import * as path from 'path';
-import { DictEntry, parseDictionary, removeEntry, upsertEntry } from './customDict';
+import { DictEntry, DictValidation, parseDictionary, removeEntry, upsertEntry, validateSource, validateTarget } from './customDict';
+import { openDictionaryPanel } from '../view/dictionaryPanel';
 import { getUserConfig } from './config';
 import { toLocale } from './utils';
 
@@ -129,6 +130,33 @@ async function writeCurrentText(file: string, text: string): Promise<void> {
     await reloadDictionary();
 }
 
+function validationMessage(code: DictValidation | undefined): string | undefined {
+    switch (code) {
+        case 'empty': return vscode.l10n.t('Must not be empty');
+        case 'tab': return vscode.l10n.t('Must not contain tabs');
+        case 'whitespace': return vscode.l10n.t('Must not contain whitespace');
+        default: return undefined;
+    }
+}
+
+/** 面板保存词条：校验后写入当前词典；`oldSource` 与 `source` 不同视为改名。 */
+async function saveEntry(oldSource: string | undefined, source: string, target: string): Promise<string | undefined> {
+    const from = source.trim();
+    const to = target.trim();
+    const error = validationMessage(validateSource(from)) ?? validationMessage(validateTarget(to));
+    if (error) {return error;}
+    const file = dictionaryFile(currentConvertLocale());
+    let text = await readCurrentText(file);
+    if (oldSource !== undefined && oldSource !== from) {text = removeEntry(text, oldSource);}
+    await writeCurrentText(file, upsertEntry(text, from, to));
+    return undefined;
+}
+
+async function deleteEntry(source: string): Promise<void> {
+    const file = dictionaryFile(currentConvertLocale());
+    await writeCurrentText(file, removeEntry(await readCurrentText(file), source));
+}
+
 /** 去掉字符串字面量两侧的引号与前缀，作为添加词条时 From 的预填值。 */
 function stripQuotes(text: string): string {
     return text.replace(/^[rR]?("""|'''|["'`])/, '').replace(/("""|'''|["'`])$/, '');
@@ -150,8 +178,7 @@ async function addEntry(initialSource?: unknown): Promise<boolean> {
         prompt: vscode.l10n.t('From: source word (any glyph)'),
         value: prefill.trim(),
         ignoreFocusOut: true,
-        validateInput: v => v.trim() === '' ? vscode.l10n.t('Must not be empty')
-            : /\t/.test(v) ? vscode.l10n.t('Must not contain tabs') : undefined,
+        validateInput: v => validationMessage(validateSource(v)),
     }))?.trim();
     if (!source) {return false;}
 
@@ -162,8 +189,7 @@ async function addEntry(initialSource?: unknown): Promise<boolean> {
         prompt: vscode.l10n.t('To: replacement for "{0}"', source),
         value: existing ?? '',
         ignoreFocusOut: true,
-        validateInput: v => v.trim() === '' ? vscode.l10n.t('Must not be empty')
-            : /\s/.test(v.trim()) ? vscode.l10n.t('Must not contain whitespace') : undefined,
+        validateInput: v => validationMessage(validateTarget(v)),
     }))?.trim();
     if (!target) {return false;}
 
@@ -172,57 +198,23 @@ async function addEntry(initialSource?: unknown): Promise<boolean> {
     return true;
 }
 
-interface ManageItem extends vscode.QuickPickItem {
-    action?: 'add' | 'import' | 'open';
-    source?: string;
-}
-
-/** 列出当前词典的词条，可新增、编辑、删除、导入或打开文件。 */
-async function manageDictionary(): Promise<void> {
-    const file = dictionaryFile(currentConvertLocale());
-    const editButton: vscode.QuickInputButton = {
-        iconPath: new vscode.ThemeIcon('edit'), tooltip: vscode.l10n.t('Edit') };
-    const deleteButton: vscode.QuickInputButton = {
-        iconPath: new vscode.ThemeIcon('trash'), tooltip: vscode.l10n.t('Delete') };
-
-    const quickPick = vscode.window.createQuickPick<ManageItem>();
-    quickPick.title = vscode.l10n.t('Custom Dictionary ({0})', getUserConfig().convertGlyph);
-    quickPick.matchOnDescription = true;
-
-    const refresh = async () => {
-        const { entries } = parseDictionary(await readCurrentText(file));
-        quickPick.items = [
-            { label: vscode.l10n.t('$(add) Add entry…'), action: 'add' },
-            { label: vscode.l10n.t('$(file-add) Import file…'), action: 'import' },
-            { label: vscode.l10n.t('$(go-to-file) Open dictionary file'), action: 'open' },
-            { label: '', kind: vscode.QuickPickItemKind.Separator },
-            ...entries.map(([source, target]): ManageItem => ({
-                label: source, description: `→ ${target}`, source, buttons: [editButton, deleteButton] })),
-        ];
-    };
-    await refresh();
-
-    quickPick.onDidAccept(() => {
-        const item = quickPick.selectedItems[0];
-        quickPick.hide();
-        if (item?.action === 'add') {void addEntry();}
-        else if (item?.action === 'import') {void importDictionary();}
-        else if (item?.action === 'open') {void editDictionary();}
-        else if (item?.source) {void addEntry(item.source);}
+/** 打开词典管理面板。 */
+function manageDictionary(): void {
+    openDictionaryPanel({
+        async getState() {
+            const file = dictionaryFile(currentConvertLocale());
+            return {
+                glyph: getUserConfig().convertGlyph,
+                file,
+                entries: parseDictionary(await readCurrentText(file)).entries,
+            };
+        },
+        save: saveEntry,
+        remove: deleteEntry,
+        importFile: importDictionary,
+        openFile: editDictionary,
+        onDidChange: onDidChangeDictionary,
     });
-    quickPick.onDidTriggerItemButton(async e => {
-        const source = e.item.source;
-        if (!source) {return;}
-        if (e.button === deleteButton) {
-            await writeCurrentText(file, removeEntry(await readCurrentText(file), source));
-            await refresh();
-        } else {
-            quickPick.hide();
-            void addEntry(source);
-        }
-    });
-    quickPick.onDidHide(() => quickPick.dispose());
-    quickPick.show();
 }
 
 export async function registerDictionary(context: vscode.ExtensionContext): Promise<void> {

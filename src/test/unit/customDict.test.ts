@@ -1,6 +1,6 @@
 import * as assert from 'assert';
 import { ensureOpenCC, createConverter } from '../../utils/opencc.js';
-import { parseDictionary, upsertEntry, removeEntry } from '../../utils/customDict.js';
+import { parseDictionary, upsertEntry, removeEntry, validateSource, validateTarget } from '../../utils/customDict.js';
 
 suite('自定义词典', function () {
     suite('parseDictionary', () => {
@@ -46,6 +46,21 @@ suite('自定义词典', function () {
 
         test('removeEntry 源词不存在时内容不变', () => {
             assert.strictEqual(removeEntry('软件\tA\n', '网络'), '软件\tA\n');
+        });
+    });
+
+    suite('输入校验', () => {
+        test('validateSource', () => {
+            assert.strictEqual(validateSource('  '), 'empty');
+            assert.strictEqual(validateSource('a\tb'), 'tab');
+            assert.strictEqual(validateSource('软件'), undefined);
+            assert.strictEqual(validateSource('软 件'), undefined);
+        });
+
+        test('validateTarget', () => {
+            assert.strictEqual(validateTarget(''), 'empty');
+            assert.strictEqual(validateTarget('軟 體'), 'whitespace');
+            assert.strictEqual(validateTarget(' 軟體 '), undefined);
         });
     });
 
