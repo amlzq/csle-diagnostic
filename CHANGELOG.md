@@ -1,6 +1,8 @@
-# Next
+# 0.3.0
 
-- Added a custom dictionary: OpenCC-format (`source<Tab>target`) text files, one per Convert Glyph (`cn.txt`, `twp.txt`, `hk.txt`, `t.txt`), managed through "Import Custom Dictionary…" / "Edit Custom Dictionary". Add entries from the editor context menu or the quick fix, and manage them (From/To input boxes, search, import) in the "Manage Custom Dictionary…" panel, which also has a glyph dropdown, export, template download and clear. Custom entries take priority over the built-in conversion; mapping a word to itself keeps it unchanged.
+- Added a custom dictionary: define your own word conversions, add entries from the right-click menu or quick fix, and manage them in one panel. Custom entries take priority over the built-in conversion, and the dictionary can be shared with your team.
+- Added the "Exclude Names By Language" setting to skip names in one language only.
+- Removed the old `excludeMethods` setting; use "Exclude Names" instead.
 
 # 0.2.0
 

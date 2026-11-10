@@ -2,7 +2,7 @@
   "name": "csle-diagnostic",
   "displayName": "%cslediagnostic.display.name%",
   "description": "Diagnose whether the string literal expression contains Chinese characters, and can quickly fix them between simplified or traditional glyphs.",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "icon": "icon.png",
   "publisher": "amlzq",
   "repository": {
@@ -99,16 +99,36 @@
           "type": "object",
           "order": 5.5,
           "properties": {
-            "dart": { "type": "string" },
-            "javascript": { "type": "string" },
-            "typescript": { "type": "string" },
-            "javascriptreact": { "type": "string" },
-            "typescriptreact": { "type": "string" },
-            "html": { "type": "string" },
-            "css": { "type": "string" },
-            "json": { "type": "string" },
-            "php": { "type": "string" },
-            "python": { "type": "string" }
+            "dart": {
+              "type": "string"
+            },
+            "javascript": {
+              "type": "string"
+            },
+            "typescript": {
+              "type": "string"
+            },
+            "javascriptreact": {
+              "type": "string"
+            },
+            "typescriptreact": {
+              "type": "string"
+            },
+            "html": {
+              "type": "string"
+            },
+            "css": {
+              "type": "string"
+            },
+            "json": {
+              "type": "string"
+            },
+            "php": {
+              "type": "string"
+            },
+            "python": {
+              "type": "string"
+            }
           },
           "additionalProperties": false,
           "default": {},
