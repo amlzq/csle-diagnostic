@@ -1,6 +1,6 @@
 Language: English | [简体中文](./README_zh.md)
 
-csle, short for "Chinese String Literal Expression", diagnoses whether the string literal expression contains Chinese characters, and can quickly convert them between the usage of different Chinese regions.
+Diagnoses whether string literal expressions contain Chinese characters, and can quickly convert them between the usage of different Chinese regions.
 
 ### Features
 
