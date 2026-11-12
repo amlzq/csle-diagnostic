@@ -30,3 +30,7 @@
 ### 感谢
 
 [opencc-js](https://github.com/nk2028/opencc-js)
+
+### 许可证
+
+[Apache License 2.0](./LICENSE)

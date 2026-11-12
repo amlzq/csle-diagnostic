@@ -4,7 +4,7 @@
   "description": "Diagnose whether the string literal expression contains Chinese characters, and can quickly convert them between the usage of different Chinese regions.",
   "version": "0.3.0",
   "icon": "icon.png",
-  "publisher": "amlzq",
+  "publisher": "Zeaon",
   "repository": {
     "type": "git",
     "url": "https://github.com/amlzq/csle-diagnostic"
@@ -13,7 +13,14 @@
     "vscode": "^1.75.0"
   },
   "categories": [
-    "Other"
+    "Linters"
+  ],
+  "keywords": [
+    "diagnostic",
+    "chinese",
+    "simplified chinese",
+    "traditional chinese",
+    "opencc"
   ],
   "activationEvents": [
     "onLanguage:dart",

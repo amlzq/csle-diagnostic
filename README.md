@@ -30,3 +30,7 @@ If you want more supported languages, new an [issue](https://github.com/amlzq/Cs
 ### Thanks
 
 [opencc-js](https://github.com/nk2028/opencc-js)
+
+### License
+
+[Apache License 2.0](./LICENSE)
