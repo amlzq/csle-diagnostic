@@ -1,4 +1,4 @@
-Language: English | [简体中文](./README_zh.md)
+Language: English | [简体中文](./README.zh-CN.md)
 
 Diagnoses whether string literal expressions contain Chinese characters, and can quickly convert them between the usage of different Chinese regions.
 
