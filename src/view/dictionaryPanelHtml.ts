@@ -11,8 +11,7 @@ export function buildPanelHtml(nonce: string, cspSource: string): string {
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style nonce="${nonce}">
 body { font-family: var(--vscode-font-family); font-size: var(--vscode-font-size); color: var(--vscode-foreground); padding: 16px 24px; }
-h2 { margin: 0 0 4px; font-weight: 600; }
-.muted { color: var(--vscode-descriptionForeground); word-break: break-all; margin-bottom: 12px; }
+h2 { margin: 0 0 12px; font-weight: 600; }
 .toolbar { display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; align-items: center; }
 .toolbar input { flex: 1; min-width: 140px; }
 select { padding: 4px 6px; color: var(--vscode-dropdown-foreground); background: var(--vscode-dropdown-background); border: 1px solid var(--vscode-dropdown-border, transparent); }
@@ -34,7 +33,6 @@ tfoot td { padding-top: 10px; }
 </head>
 <body>
 <h2 id="title"></h2>
-<div class="muted" id="file"></div>
 <div class="toolbar">
   <label for="locale" id="glyphLabel"></label>
   <select id="locale"></select>
@@ -68,7 +66,6 @@ tfoot td { padding-top: 10px; }
     if (!state) { return; }
     const L = state.labels;
     $('title').textContent = L.title;
-    $('file').textContent = state.file;
     $('glyphLabel').textContent = L.glyph;
     const select = $('locale');
     if (select.options.length !== state.locales.length) {

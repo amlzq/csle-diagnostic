@@ -276,8 +276,7 @@ function manageDictionary(): void {
         locales: LOCALES.map(value => ({ value, label: localeLabel(value) })),
         initialLocale: currentConvertLocale(),
         async getState(locale) {
-            const file = dictionaryFile(locale);
-            return { file, entries: parseDictionary(await readCurrentText(file)).entries };
+            return { entries: parseDictionary(await readCurrentText(dictionaryFile(locale))).entries };
         },
         save: saveEntry,
         remove: deleteEntry,

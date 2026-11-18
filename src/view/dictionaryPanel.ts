@@ -2,7 +2,6 @@ import * as vscode from 'vscode';
 import { buildPanelHtml } from './dictionaryPanelHtml';
 
 export interface PanelState {
-    file: string;
     entries: Array<[string, string]>;
 }
 
