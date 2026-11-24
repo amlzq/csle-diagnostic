@@ -20,9 +20,9 @@ Diagnoses whether string literal expressions contain Chinese characters, and can
 - PHP
 - Python
 
-If you want more supported languages, new an [issue](https://github.com/amlzq/CsleInspection/issues).
+If you want more supported languages, open an [issue](https://github.com/amlzq/csle-diagnostic/issues).
 
-### Installation
+### Select IDE
 
 [VSCode extension](https://marketplace.visualstudio.com/items?itemName=amlzq.csle-diagnostic)
 

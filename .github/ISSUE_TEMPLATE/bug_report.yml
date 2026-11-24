@@ -22,15 +22,15 @@ body:
     attributes:
       label: Language / 语言
       options:
-        - Dart
-        - JavaScript
-        - TypeScript
-        - JSX / TSX
-        - HTML
         - CSS
+        - Dart
+        - HTML
+        - JavaScript
         - JSON
+        - JSX / TSX
         - PHP
         - Python
+        - TypeScript
         - Other / 其他
     validations:
       required: true
