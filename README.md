@@ -4,11 +4,11 @@ Diagnoses whether string literal expressions contain Chinese characters, and can
 
 ### Features
 
-- **Diagnose string literals**: finds string literals that contain Chinese characters and quick-fixes them between the usage of different Chinese regions (Simplified, Taiwan, Hong Kong, general Traditional). Documentation comments can optionally be checked too (`checkDocComment`).
-- **Choose the glyphs**: in the settings, pick the glyph to diagnose (`checkGlyph`) and the glyph to convert to (`convertGlyph`).
-- **Exclude names**: skip strings at certain locations, such as keys, tags, or function calls like `print`. `excludeNames` applies to all languages; `excludeNamesByLanguage` adds names for one language only (pick the language as the item, enter comma-separated names as the value).
-- **Diagnose all files**: scan the whole workspace from the Command Palette (`Chinese Expression Diagnostic: Diagnostic All Files`) or right-click a folder in the Explorer and choose `Diagnostic This Folder`. Results are listed by file in the **Chinese Expression Diagnostic** view, where you can jump to an item, accept or dismiss it, accept a file, or `Accept All`. Files are not saved and changes can be undone. Enable `autoDiagnosticOnOpen` (off by default) to scan when a project opens; nothing is modified automatically. Related settings: `workspaceExclude`, `maxFileSize`, `previewBeforeApply`, `saveAfterApply`, `autoDiagnosticMaxFiles`.
-- **Custom dictionary**: override the built-in conversion with your own word mappings. Dictionaries use the OpenCC format (`source<Tab>target`, one entry per line, `#` starts a comment) and are kept one file per Convert Glyph (`cn.txt`, `twp.txt`, `hk.txt`, `t.txt`). Set `customDictionaryDirectory` to a folder in your repository (`${workspaceFolder}` or a relative path) to share one dictionary with your team. Add entries from the right-click menu (**Add Custom Dictionary Entry…**) or the **Add to custom dictionary…** quick fix, and use **Manage Custom Dictionary…** to search, edit, delete, import, export, or clear entries for any glyph. Custom entries win over the built-in conversion, and mapping a word to itself keeps it unchanged.
+- **Automatic Chinese detection**: flags string literals that contain Chinese characters while you edit, and converts them to different regional usages (Simplified, Taiwan, Hong Kong, general Traditional) with a quick fix. Checking comments is optional.
+- **Choose your regions**: pick which Chinese variant to check and which one to convert to.
+- **Skip what you don't need**: exclude Chinese in keys, tags, or function-call arguments, either globally or for a specific language.
+- **Scan a whole project**: run `Chinese Expression Diagnostic: Diagnostic All Files` from the Command Palette, or right-click a folder and choose `Diagnostic This Folder`. Results are grouped by file; you can jump to an item, accept or dismiss it, or accept everything at once. Nothing is saved automatically, changes can be undone, and scanning on project open is off by default.
+- **Custom dictionary**: override the built-in conversion with your own word mappings, organized by region and shared with your team. Add entries from the right-click menu or a quick fix, and manage, import, or export them in one place.
 
 ### Supported languages
 
