@@ -37,17 +37,17 @@ type Extractor = (doc: vscode.TextDocument, options: ExtractOptions) =>
 /** 返回 undefined 表示该语言不受支持 */
 function getExtractor(languageId: string): { extract: Extractor; docComment: boolean } | undefined {
     switch (languageId) {
-        case 'dart': return { extract: extractDartStrings, docComment: true };
-        case 'javascript':
-        case 'typescript':
-        case 'javascriptreact':
-        case 'typescriptreact': return { extract: extractWebStrings, docComment: true };
         // HTML/CSS/JSON 没有文档注释语法
-        case 'html': return { extract: extractHtmlStrings, docComment: false };
         case 'css': return { extract: extractCssStrings, docComment: false };
+        case 'dart': return { extract: extractDartStrings, docComment: true };
+        case 'html': return { extract: extractHtmlStrings, docComment: false };
+        case 'javascript':
+        case 'javascriptreact': return { extract: extractWebStrings, docComment: true };
         case 'json': return { extract: extractJsonStrings, docComment: false };
         case 'php': return { extract: extractPHPStrings, docComment: true };
         case 'python': return { extract: extractPythonStrings, docComment: true };
+        case 'typescript':
+        case 'typescriptreact': return { extract: extractWebStrings, docComment: true };
         default: return undefined;
     }
 }

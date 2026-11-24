@@ -10,7 +10,7 @@ import { scheduleAutoDiagnostic } from './commands/autoDiagnostic';
 import { registerDictionary, onDidChangeDictionary } from './utils/dictionaryStore';
 import { scanOpenedUris } from './scan/scanState';
 
-const languages = ['dart', 'javascript', 'typescript', 'javascriptreact', 'typescriptreact', 'html', 'css', 'json', 'php', 'python'];
+const languages = ['css', 'dart', 'html', 'javascript', 'javascriptreact', 'json', 'php', 'python', 'typescript', 'typescriptreact'];
 
 export async function activate(context: vscode.ExtensionContext) {
     await ensureOpenCC();

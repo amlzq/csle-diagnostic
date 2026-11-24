@@ -12,9 +12,10 @@
 
 ### 支持语言
 
+- CSS
 - Dart
+- HTML
 - JavaScript and TypeScript
-- HTML / CSS
 - JSON
 - PHP
 - Python

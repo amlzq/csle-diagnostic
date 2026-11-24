@@ -18,7 +18,7 @@ export interface ScanSummary {
     cancelled: boolean;
 }
 
-const SUPPORTED_EXTENSIONS = ['dart', 'js', 'mjs', 'cjs', 'ts', 'jsx', 'tsx', 'html', 'htm', 'css', 'json', 'php', 'py'];
+const SUPPORTED_EXTENSIONS = ['cjs', 'css', 'dart', 'htm', 'html', 'js', 'json', 'jsx', 'mjs', 'php', 'py', 'ts', 'tsx'];
 const INCLUDE_GLOB = `**/*.{${SUPPORTED_EXTENSIONS.join(',')}}`;
 const DEFAULT_EXCLUDES = [
     '**/node_modules/**', '**/.git/**', '**/out/**', '**/dist/**', '**/build/**',

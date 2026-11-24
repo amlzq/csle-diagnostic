@@ -12,9 +12,10 @@ Diagnoses whether string literal expressions contain Chinese characters, and can
 
 ### Supported languages
 
+- CSS
 - Dart
+- HTML
 - JavaScript and TypeScript
-- HTML / CSS
 - JSON
 - PHP
 - Python

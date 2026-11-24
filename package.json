@@ -23,17 +23,17 @@
     "opencc"
   ],
   "activationEvents": [
-    "onLanguage:dart",
-    "onLanguage:javascript",
-    "onLanguage:typescript",
-    "onLanguage:javascriptreact",
-    "onLanguage:typescriptreact",
-    "onLanguage:html",
     "onLanguage:css",
+    "onLanguage:dart",
+    "onLanguage:html",
+    "onLanguage:javascript",
+    "onLanguage:javascriptreact",
     "onLanguage:json",
     "onLanguage:php",
     "onLanguage:python",
-    "workspaceContains:**/*.{dart,js,mjs,cjs,ts,jsx,tsx,html,htm,css,json,php,py}"
+    "onLanguage:typescript",
+    "onLanguage:typescriptreact",
+    "workspaceContains:**/*.{cjs,css,dart,htm,html,js,json,jsx,mjs,php,py,ts,tsx}"
   ],
   "main": "./out/extension.js",
   "l10n": "./l10n",
@@ -106,25 +106,19 @@
           "type": "object",
           "order": 5.5,
           "properties": {
+            "css": {
+              "type": "string"
+            },
             "dart": {
-              "type": "string"
-            },
-            "javascript": {
-              "type": "string"
-            },
-            "typescript": {
-              "type": "string"
-            },
-            "javascriptreact": {
-              "type": "string"
-            },
-            "typescriptreact": {
               "type": "string"
             },
             "html": {
               "type": "string"
             },
-            "css": {
+            "javascript": {
+              "type": "string"
+            },
+            "javascriptreact": {
               "type": "string"
             },
             "json": {
@@ -134,6 +128,12 @@
               "type": "string"
             },
             "python": {
+              "type": "string"
+            },
+            "typescript": {
+              "type": "string"
+            },
+            "typescriptreact": {
               "type": "string"
             }
           },
@@ -194,6 +194,16 @@
     },
     "languages": [
       {
+        "id": "css",
+        "extensions": [
+          ".css"
+        ],
+        "aliases": [
+          "CSS",
+          "css"
+        ]
+      },
+      {
         "id": "dart",
         "extensions": [
           ".dart"
@@ -201,6 +211,17 @@
         "aliases": [
           "Dart",
           "dart"
+        ]
+      },
+      {
+        "id": "html",
+        "extensions": [
+          ".htm",
+          ".html"
+        ],
+        "aliases": [
+          "HTML",
+          "html"
         ]
       },
       {
@@ -221,47 +242,6 @@
         "aliases": [
           "JavaScript React",
           "jsx"
-        ]
-      },
-      {
-        "id": "typescript",
-        "extensions": [
-          ".ts"
-        ],
-        "aliases": [
-          "TypeScript",
-          "typescript"
-        ]
-      },
-      {
-        "id": "typescriptreact",
-        "extensions": [
-          ".tsx"
-        ],
-        "aliases": [
-          "TypeScript React",
-          "tsx"
-        ]
-      },
-      {
-        "id": "html",
-        "extensions": [
-          ".html",
-          ".htm"
-        ],
-        "aliases": [
-          "HTML",
-          "html"
-        ]
-      },
-      {
-        "id": "css",
-        "extensions": [
-          ".css"
-        ],
-        "aliases": [
-          "CSS",
-          "css"
         ]
       },
       {
@@ -292,6 +272,26 @@
         "aliases": [
           "Python",
           "python"
+        ]
+      },
+      {
+        "id": "typescript",
+        "extensions": [
+          ".ts"
+        ],
+        "aliases": [
+          "TypeScript",
+          "typescript"
+        ]
+      },
+      {
+        "id": "typescriptreact",
+        "extensions": [
+          ".tsx"
+        ],
+        "aliases": [
+          "TypeScript React",
+          "tsx"
         ]
       }
     ],
